@@ -10,6 +10,104 @@ Globals:
 
 Resources:
 
+  # -- HTTP API --
+  CardGameHttpApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: CardGameHttpApi
+      StageName: dev
+      Cors: 
+        AllowMethods: "'*'"
+        AllowHeaders: "'*'"
+        AllowOrigin: "'*'"
+      Auth:
+        DefaultAuthorizer: CardsCognitoUserPoolAuthorizer
+        AddDefaultAuthorizerToCorsPreflight: False
+        Authorizers: 
+          CardsCognitoUserPoolAuthorizer:
+            UserPoolArn: !GetAtt CardsCognitoUserPool.Arn 
+    
+  UserFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: app.handle
+      Runtime: python3.7
+      CodeUri: ./users
+      Events:
+        Root:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CardGameHttpApi
+            Path: /users
+            Method: GET
+  
+  CardsCognitoUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: cards-cognito-user-pool
+      LambdaConfig:
+        PreSignUp: !GetAtt PreSignupFunction.Arn
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+      UsernameAttributes:
+        - email
+      Schema:
+        - AttributeDataType: String
+          Name: email
+          Required: false
+  
+  CardsCognitoUserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AllowedOAuthFlows:  
+        - implicit 
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes: 
+        - phone
+        - email
+        - openid
+        - profile
+      CallbackURLs: 
+        - http://localhost
+      ClientName: cards-cognito-user-pool-client
+      DefaultRedirectURI: http://localhost
+      GenerateSecret: false
+      LogoutURLs: 
+        - http://localhost
+      PreventUserExistenceErrors: ENABLED
+      RefreshTokenValidity: 7
+      SupportedIdentityProviders: 
+        - COGNITO
+      UserPoolId: !Ref CardsCognitoUserPool
+
+  CardsCognitoUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties: 
+      Domain: !GetAtt CardGameHttpApi.RootResourceId
+      UserPoolId: !Ref CardsCognitoUserPool
+  
+  PreSignupFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      InlineCode: |
+        def handler(event, context):
+          event['response']['autoConfirmUser'] = False
+          return event
+      Handler: index.handler
+      MemorySize: 128
+      Runtime: python3.7
+      Timeout: 3
+
+  LambdaCognitoUserPoolExecutionPermission:
+    Type: AWS::Lambda::Permission
+    Properties: 
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt PreSignupFunction.Arn
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !Sub 'arn:${AWS::Partition}:cognito-idp:${AWS::Region}:${AWS::AccountId}:userpool/${CardsCognitoUserPool}'
+
+  # -- WEB SOCKETS --  
   CardGameWebSocketApi:
     Type: AWS::ApiGatewayV2::Api
     Properties:
@@ -80,7 +178,7 @@ Resources:
   OnConnectFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: connection/
+      CodeUri: sockets/
       Handler: connect.handle
       MemorySize: 256
       Runtime: python3.7
@@ -97,7 +195,7 @@ Resources:
   OnDisconnectFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: connection/
+      CodeUri: sockets/
       Handler: disconnect.handle
       MemorySize: 256
       Runtime: python3.7

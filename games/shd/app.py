@@ -1,4 +1,6 @@
 import json
+from .game import Game
+
 # import requests
 
 
