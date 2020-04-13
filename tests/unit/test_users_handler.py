@@ -10,7 +10,7 @@ from users.func.handler import handle, get_user_from_claims
 class TestUserHanlder(TestCase):
 
     def setUp(self):
-        with open('events/get-user-authd.json', 'r') as f:
+        with open('tests/events/get-user-authd.json', 'r') as f:
             self.get_user_authd_event = json.load(f)        
 
     def test_get_user_from_event_clams(self):
