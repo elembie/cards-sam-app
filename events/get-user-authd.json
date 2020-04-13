@@ -1,0 +1,137 @@
+{
+    "resource": "/user",
+    "path": "/user",
+    "httpMethod": "GET",
+    "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate",
+        "Authorization": "eyJraWQiOiJjSVdWcGtlVWxnMUZuZDdaaTljOHlLZ0xzRDVaK0UxXC9rdEtwZ2NWK2Z0WT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoia1g1aDdSZFZqdjFCa09aY2FjZFFvdyIsInN1YiI6IjA0ZjE5MDE4LWMyN2UtNDA5Ny1iODRjLTQ5ZWQ0NzRkMDEzNCIsImF1ZCI6IjZ1cjA2N2N0OHMzdmFpY2J1ZjF0OHMxN3ZvIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNTg2NjYwNzY4LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuYXAtc291dGhlYXN0LTIuYW1hem9uYXdzLmNvbVwvYXAtc291dGhlYXN0LTJfRG9rZ1pjakg2IiwiY29nbml0bzp1c2VybmFtZSI6IjA0ZjE5MDE4LWMyN2UtNDA5Ny1iODRjLTQ5ZWQ0NzRkMDEzNCIsInBob25lX251bWJlciI6Iis2MTQyNDQ0ODI2OSIsImV4cCI6MTU4NjY2NDM2OCwiaWF0IjoxNTg2NjYwNzY4LCJlbWFpbCI6Imxld2JhaWxleTk0QGdtYWlsLmNvbSJ9.TVTMGLj9OkIBNHRT_Np8DgrDLrWb_g3xL14mH_xGQuLbRFzaVOKdaUT0zEEFTdGoqEScW6efOXFQ1g4d6gYx7Ca9_1td5E3AB8J2EQ8sAiyj14A2MXXCYi-MmSqQ5Je2re5xjT2ZPJP1k1RE1_OaY6PXZupIjhxt7hEbCVf40Zg7k--8CBsc202bxAwv20I-PhRK4qEjolUaSRdCg6Aj_P1r0mGJqTZ_9Tgh9z-oqvYheHV8AP99FbXfcYiQC_pCQqRiF3S9f8EH5DM6jegDNhVWWxRcgJfG0AlXHcH44OzMqSfEd2-zgJYrKc5Pk6rsULMk0dOZncLr1Rma4K4Opw",
+        "Cache-Control": "no-cache",
+        "CloudFront-Forwarded-Proto": "https",
+        "CloudFront-Is-Desktop-Viewer": "true",
+        "CloudFront-Is-Mobile-Viewer": "false",
+        "CloudFront-Is-SmartTV-Viewer": "false",
+        "CloudFront-Is-Tablet-Viewer": "false",
+        "CloudFront-Viewer-Country": "AU",
+        "Host": "xvpaggil7h.execute-api.ap-southeast-2.amazonaws.com",
+        "Postman-Token": "24ce5185-3551-48e3-9080-c0f3879fd7e7",
+        "User-Agent": "PostmanRuntime/7.21.0",
+        "Via": "1.1 94c2c8df52e3cc7443d3d7e2d0cea1d0.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "lmVxz-0vnAuwCc1DogBgxIPjc1H0vvBONNk7svZ81xAEu7P3qe2zKg==",
+        "X-Amzn-Trace-Id": "Root=1-5e9288e8-842e5219db453fddcf1f773f",
+        "X-Forwarded-For": "155.143.243.40, 70.132.29.135",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https"
+    },
+    "multiValueHeaders": {
+        "Accept": [
+            "*/*"
+        ],
+        "Accept-Encoding": [
+            "gzip, deflate"
+        ],
+        "Authorization": [
+            "eyJraWQiOiJjSVdWcGtlVWxnMUZuZDdaaTljOHlLZ0xzRDVaK0UxXC9rdEtwZ2NWK2Z0WT0iLCJhbGciOiJSUzI1NiJ9.eyJhdF9oYXNoIjoia1g1aDdSZFZqdjFCa09aY2FjZFFvdyIsInN1YiI6IjA0ZjE5MDE4LWMyN2UtNDA5Ny1iODRjLTQ5ZWQ0NzRkMDEzNCIsImF1ZCI6IjZ1cjA2N2N0OHMzdmFpY2J1ZjF0OHMxN3ZvIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInRva2VuX3VzZSI6ImlkIiwiYXV0aF90aW1lIjoxNTg2NjYwNzY4LCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuYXAtc291dGhlYXN0LTIuYW1hem9uYXdzLmNvbVwvYXAtc291dGhlYXN0LTJfRG9rZ1pjakg2IiwiY29nbml0bzp1c2VybmFtZSI6IjA0ZjE5MDE4LWMyN2UtNDA5Ny1iODRjLTQ5ZWQ0NzRkMDEzNCIsInBob25lX251bWJlciI6Iis2MTQyNDQ0ODI2OSIsImV4cCI6MTU4NjY2NDM2OCwiaWF0IjoxNTg2NjYwNzY4LCJlbWFpbCI6Imxld2JhaWxleTk0QGdtYWlsLmNvbSJ9.TVTMGLj9OkIBNHRT_Np8DgrDLrWb_g3xL14mH_xGQuLbRFzaVOKdaUT0zEEFTdGoqEScW6efOXFQ1g4d6gYx7Ca9_1td5E3AB8J2EQ8sAiyj14A2MXXCYi-MmSqQ5Je2re5xjT2ZPJP1k1RE1_OaY6PXZupIjhxt7hEbCVf40Zg7k--8CBsc202bxAwv20I-PhRK4qEjolUaSRdCg6Aj_P1r0mGJqTZ_9Tgh9z-oqvYheHV8AP99FbXfcYiQC_pCQqRiF3S9f8EH5DM6jegDNhVWWxRcgJfG0AlXHcH44OzMqSfEd2-zgJYrKc5Pk6rsULMk0dOZncLr1Rma4K4Opw"
+        ],
+        "Cache-Control": [
+            "no-cache"
+        ],
+        "CloudFront-Forwarded-Proto": [
+            "https"
+        ],
+        "CloudFront-Is-Desktop-Viewer": [
+            "true"
+        ],
+        "CloudFront-Is-Mobile-Viewer": [
+            "false"
+        ],
+        "CloudFront-Is-SmartTV-Viewer": [
+            "false"
+        ],
+        "CloudFront-Is-Tablet-Viewer": [
+            "false"
+        ],
+        "CloudFront-Viewer-Country": [
+            "AU"
+        ],
+        "Host": [
+            "xvpaggil7h.execute-api.ap-southeast-2.amazonaws.com"
+        ],
+        "Postman-Token": [
+            "24ce5185-3551-48e3-9080-c0f3879fd7e7"
+        ],
+        "User-Agent": [
+            "PostmanRuntime/7.21.0"
+        ],
+        "Via": [
+            "1.1 94c2c8df52e3cc7443d3d7e2d0cea1d0.cloudfront.net (CloudFront)"
+        ],
+        "X-Amz-Cf-Id": [
+            "lmVxz-0vnAuwCc1DogBgxIPjc1H0vvBONNk7svZ81xAEu7P3qe2zKg=="
+        ],
+        "X-Amzn-Trace-Id": [
+            "Root=1-5e9288e8-842e5219db453fddcf1f773f"
+        ],
+        "X-Forwarded-For": [
+            "155.143.243.40, 70.132.29.135"
+        ],
+        "X-Forwarded-Port": [
+            "443"
+        ],
+        "X-Forwarded-Proto": [
+            "https"
+        ]
+    },
+    "queryStringParameters": null,
+    "multiValueQueryStringParameters": null,
+    "pathParameters": null,
+    "stageVariables": null,
+    "requestContext": {
+        "resourceId": "s898pi",
+        "authorizer": {
+            "claims": {
+                "at_hash": "kX5h7RdVjv1BkOZcacdQow",
+                "sub": "04f19018-c27e-4097-b84c-49ed474d0134",
+                "aud": "6ur067ct8s3vaicbuf1t8s17vo",
+                "email_verified": "true",
+                "token_use": "id",
+                "auth_time": "1586660768",
+                "iss": "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_DokgZcjH6",
+                "cognito:username": "04f19018-c27e-4097-b84c-49ed474d0134",
+                "phone_number": "+61999999999",
+                "exp": "Sun Apr 12 04:06:08 UTC 2020",
+                "iat": "Sun Apr 12 03:06:08 UTC 2020",
+                "email": "test@gmail.com"
+            }
+        },
+        "resourcePath": "/user",
+        "httpMethod": "GET",
+        "extendedRequestId": "K2pUZHIZywMFqxA=",
+        "requestTime": "12/Apr/2020:03:20:08 +0000",
+        "path": "/dev/user",
+        "accountId": "016685703235",
+        "protocol": "HTTP/1.1",
+        "stage": "dev",
+        "domainPrefix": "xvpaggil7h",
+        "requestTimeEpoch": 1586661608885,
+        "requestId": "3ccdaa7f-f3e7-43ea-a27c-010c32f841dd",
+        "identity": {
+            "cognitoIdentityPoolId": null,
+            "accountId": null,
+            "cognitoIdentityId": null,
+            "caller": null,
+            "sourceIp": "155.143.243.40",
+            "principalOrgId": null,
+            "accessKey": null,
+            "cognitoAuthenticationType": null,
+            "cognitoAuthenticationProvider": null,
+            "userArn": null,
+            "userAgent": "PostmanRuntime/7.21.0",
+            "user": null
+        },
+        "domainName": "xvpaggil7h.execute-api.ap-southeast-2.amazonaws.com",
+        "apiId": "xvpaggil7h"
+    },
+    "body": null,
+    "isBase64Encoded": false
+}

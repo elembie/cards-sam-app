@@ -3,7 +3,6 @@ from dataclasses import dataclass
 @dataclass
 class User(object):
 
+    id: str = None
     email: str = None
-    first_name: str = None
-    last_name: str = None
     phone: str = None

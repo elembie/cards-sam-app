@@ -30,16 +30,22 @@ Resources:
   UserFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: app.handle
+      Handler: func.handler.handle
       Runtime: python3.7
       CodeUri: ./users
       Events:
-        Root:
+        GetOrCreateUser:
           Type: Api
           Properties:
             RestApiId: !Ref CardGameHttpApi
-            Path: /users
+            Path: /user
             Method: GET
+        GetUser:
+            Type: Api
+            Properties:
+              RestApiId: !Ref CardGameHttpApi
+              Path: /user/{user_id}
+              Method: GET
   
   CardsCognitoUserPool:
     Type: AWS::Cognito::UserPool
@@ -90,6 +96,7 @@ Resources:
   PreSignupFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: presignup/
       InlineCode: |
         def handler(event, context):
           event['response']['autoConfirmUser'] = False

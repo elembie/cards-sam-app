@@ -4,9 +4,9 @@ from random import shuffle
 from typing import Dict, List, Any
 from dataclasses import dataclass, field, asdict
 
-from game.constants import SUITS, RANKS
-from game.exceptions import InvalidAction, InvalidState
-from game.entities import (
+from .constants import SUITS, RANKS
+from .exceptions import InvalidAction, InvalidState
+from .entities import (
     Card, Meta, State, Status, Player
 )
 

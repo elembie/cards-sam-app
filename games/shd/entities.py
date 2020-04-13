@@ -4,8 +4,8 @@ from random import shuffle
 from typing import Dict, List, Any
 from dataclasses import dataclass, field, asdict
 
-from game.exceptions import InvalidState
-from game.constants import RANKS, SPECIALS, SUITS
+from .exceptions import InvalidState
+from .constants import RANKS, SPECIALS, SUITS
 
 @dataclass
 class Card(object):
