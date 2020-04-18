@@ -5,7 +5,15 @@ Description: >
 
 
 Parameters:
-  TableName:
+
+  EnvironmentParam:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+    Default: dev
+
+  TableNameParam:
     Type: String
     Default: 'cards-app-table'
 
@@ -16,7 +24,8 @@ Globals:
     Runtime: python3.7
     Environment:
       Variables:
-        TABLE_NAME: !Ref TableName
+        TABLE_NAME: !Ref TableNameParam
+        ENV: !Ref EnvironmentParam
 
 
 Resources:
@@ -42,8 +51,10 @@ Resources:
     Type: 'AWS::Serverless::Function'
     Properties:
       Handler: func.handler.handle
-      
-      CodeUri: ./users
+      CodeUri: functions/users/
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName: !Ref TableNameParam
       Events:
         GetOrCreateUser:
           Type: Api
@@ -107,7 +118,7 @@ Resources:
   PreSignupFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: presignup/
+      CodeUri: functions/presignup/
       InlineCode: |
         def handler(event, context):
           event['response']['autoConfirmUser'] = False
@@ -188,7 +199,7 @@ Resources:
   Stage:
     Type: AWS::ApiGatewayV2::Stage
     Properties:
-      StageName: dev
+      StageName: !Ref EnvironmentParam
       Description: Development stage
       DeploymentId: !Ref Deployment
       ApiId: !Ref CardGameWebSocketApi
@@ -196,7 +207,7 @@ Resources:
   OnConnectFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: sockets/
+      CodeUri: functions/connections/
       Handler: connect.handle
       MemorySize: 256
       
@@ -213,7 +224,7 @@ Resources:
   OnDisconnectFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: sockets/
+      CodeUri: functions/connections/
       Handler: disconnect.handle
       MemorySize: 256
       
@@ -246,7 +257,7 @@ Resources:
         WriteCapacityUnits: 1
       SSESpecification:
         SSEEnabled: True
-      TableName: !Ref TableName
+      TableName: !Ref TableNameParam
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function

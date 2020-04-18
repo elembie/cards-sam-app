@@ -11,9 +11,15 @@ class User(object):
     in_game: bool = False
 
     def __post_init__(self):
-        
         if self.id:
             if not self.pk:
                 self.pk = f'USER#{self.id}'
             if not self.sk:
                 self.sk = f'#META#{self.id}'
+
+    def to_dict(self):
+        return {
+            k: v
+            for k, v in self.__dict__.items()
+            if k not in ['pk', 'sk']
+        }

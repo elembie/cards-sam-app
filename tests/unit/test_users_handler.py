@@ -1,17 +1,23 @@
 import sys
 import json
+
 from unittest import TestCase
+from unittest.mock import patch, MagicMock
 
 sys.dont_write_bytecode = True
 
-from users.func.lib.entities import User
-from users.func.handler import handle, get_user_from_claims
+from functions.users.func.entities import User
+from functions.users.func.handler import handle, get_user_from_claims
 
 class TestUserHanlder(TestCase):
 
     def setUp(self):
         with open('tests/events/get-user-authd.json', 'r') as f:
-            self.get_user_authd_event = json.load(f)        
+            self.get_user_authd_event = json.load(f)   
+
+        with open('tests/events/get-user-no-claims.json', 'r') as f:
+            self.get_user_no_claims_event = json.load(f)    
+
 
     def test_get_user_from_event_clams(self):
 
@@ -21,10 +27,15 @@ class TestUserHanlder(TestCase):
         self.assertEqual(user.email, 'test@gmail.com')
         self.assertEqual(user.phone, '+61999999999')
 
+
     def test_get_user_authorized(self):
 
         result = handle(self.get_user_authd_event, None)
-
-        print(json.dumps(result, indent=3))
         self.assertEqual(result['statusCode'], 200)
+
+    
+    def test_get_user_no_claims(self):
+
+        result = handle(self.get_user_no_claims_event, None)
+        self.assertEqual(result['statusCode'], 400)
         
