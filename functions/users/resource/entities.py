@@ -9,6 +9,7 @@ class User(object):
     email: str = None
     phone: str = None
     in_game: bool = False
+    game_id: str = None
 
     def __post_init__(self):
         if self.id:

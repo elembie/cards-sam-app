@@ -7,23 +7,23 @@ import boto3
 from boto3.exceptions import Boto3Error
 
 try:
-    from func.entities import User
+    from resource.entities import User
 except ImportError:
     # unit testing import
-    from functions.users.func.entities import User
+    from functions.users.resource.entities import User
 
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
 
-if not os.environ['ENV']:
+if 'ENV' not in os.environ:
     # running locally
     dynamo = boto3.resource('dynamodb', endpoint_url='http://localhost:8000/')
 else:
     dynamo = boto3.resource('dynamodb')
 
-table = dynamo.Table(os.environ['TABLE_NAME'])
+table = dynamo.Table(os.environ.get('TABLE_NAME', 'cards-app-table'))
 
 
 def make_response(code: int, body: dict) -> dict:

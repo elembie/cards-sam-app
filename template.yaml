@@ -50,11 +50,11 @@ Resources:
   UserFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: func.handler.handle
-      CodeUri: functions/users/
+      CodeUri: functions/users
+      Handler: resource.handler.handle
       Policies:
-      - DynamoDBCrudPolicy:
-          TableName: !Ref TableNameParam
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableNameParam
       Events:
         GetOrCreateUser:
           Type: Api
@@ -68,6 +68,40 @@ Resources:
               RestApiId: !Ref CardGameHttpApi
               Path: /user/{user_id}
               Method: GET
+
+  GamesFunction:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      CodeUri: functions/games/meta
+      Handler: resource.handler.handle
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableNameParam
+      Events:
+        CreateGame:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CardGameHttpApi
+            Path: /games
+            Method: POST
+        GetGamesPaginated:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CardGameHttpApi
+            Path: /games
+            Method: GET
+        GetGame:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CardGameHttpApi
+            Path: /games/{game_id}
+            Method: GET
+        ExitGame:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CardGameHttpApi
+            Path: /games/{game_id}/users/{user_id}
+            Method: DELETE
   
   CardsCognitoUserPool:
     Type: AWS::Cognito::UserPool

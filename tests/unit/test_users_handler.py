@@ -6,8 +6,8 @@ from unittest.mock import patch, MagicMock
 
 sys.dont_write_bytecode = True
 
-from functions.users.func.entities import User
-from functions.users.func.handler import handle, get_user_from_claims
+from functions.users.resource.entities import User
+from functions.users.resource.handler import handle, get_user_from_claims
 
 class TestUserHanlder(TestCase):
 

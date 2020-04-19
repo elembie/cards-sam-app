@@ -1,0 +1,145 @@
+{
+    "resource": "/games/{game_id}/users/{user_id}",
+    "path": "/games/01b93719-a256-4c71-b793-66be5036f2f6/users/b6eb4413-60cc-4184-8d6a-e55959a0ce6f",
+    "httpMethod": "DELETE",
+    "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate",
+        "Authorization": "Bearer eyJraWQiOiJGR1NsQjkwS1VOXC9JS0Q1bEJHXC9GM0ZDT2x5ZXNYTEVkWFZNNlwvTUFlN2xnPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoib2lxaU9kRldRVzNOSGx2cHZHaTdtQSIsInN1YiI6ImI2ZWI0NDEzLTYwY2MtNDE4NC04ZDZhLWU1NTk1OWEwY2U2ZiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuYXAtc291dGhlYXN0LTIuYW1hem9uYXdzLmNvbVwvYXAtc291dGhlYXN0LTJfS3l2cUpKOFpYIiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjp0cnVlLCJjb2duaXRvOnVzZXJuYW1lIjoiYjZlYjQ0MTMtNjBjYy00MTg0LThkNmEtZTU1OTU5YTBjZTZmIiwiYXVkIjoiNWo1anMzcXZjZm5naDA4NWEwb2Jrc21rajkiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTU4NzI3Mzk1MiwicGhvbmVfbnVtYmVyIjoiKzYxNDI0NDQ4MjY5IiwiZXhwIjoxNTg3Mjc3NTUyLCJpYXQiOjE1ODcyNzM5NTIsImVtYWlsIjoibGV3YmFpbGV5OTRAZ21haWwuY29tIn0.yEwDhgHR0tTpi3YkbNwAHrT6dxKmrrvKCFeYBbykMKNMRSad7TuleIwEVyI7iZXa_vD_o5-VyA-Y6SKzjE01iHC3wiTiKAavWybWXpZesAnV8Hky9_40VXh-lUQ3pcTdXG1pqbQyHKEpgnm0phmbXvmdR8JKd2H8ypwOICtLwNTO9UpXgWdqDGyJXubMRilg9T1DcWqRZTeW-fbhsgkGGoKPyx9aXPDyTtCVbcteO_Z4U3V4yvXugu0xyAFV4CpycXvgZyEGJQZK_c9mqpEvUmxjYKFfbC7-Q1jAaFuLxBw5MZ1JRQCKYPoNugSC8RoCFIbsHjB2cXQfM7472UiNOQ",
+        "Cache-Control": "no-cache",
+        "CloudFront-Forwarded-Proto": "https",
+        "CloudFront-Is-Desktop-Viewer": "true",
+        "CloudFront-Is-Mobile-Viewer": "false",
+        "CloudFront-Is-SmartTV-Viewer": "false",
+        "CloudFront-Is-Tablet-Viewer": "false",
+        "CloudFront-Viewer-Country": "AU",
+        "Content-Type": "application/json",
+        "Host": "4fgvpp9jlc.execute-api.ap-southeast-2.amazonaws.com",
+        "Postman-Token": "608fa39c-dca8-42d8-8274-b4429cdd38b5",
+        "User-Agent": "PostmanRuntime/7.21.0",
+        "Via": "1.1 4cc1cef5b7e8e0c2a1020c88ce286fbd.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "KvlsDyQGr_nPusrftqetZUvNQQ2mvw7KM69sDmUZCkU77fN8m_dsHA==",
+        "X-Amzn-Trace-Id": "Root=1-5e9beddf-9eba33a955002a266c58419c",
+        "X-Forwarded-For": "155.143.243.40, 64.252.174.89",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https"
+    },
+    "multiValueHeaders": {
+        "Accept": [
+            "*/*"
+        ],
+        "Accept-Encoding": [
+            "gzip, deflate"
+        ],
+        "Authorization": [
+            "Bearer eyJraWQiOiJGR1NsQjkwS1VOXC9JS0Q1bEJHXC9GM0ZDT2x5ZXNYTEVkWFZNNlwvTUFlN2xnPSIsImFsZyI6IlJTMjU2In0.eyJhdF9oYXNoIjoib2lxaU9kRldRVzNOSGx2cHZHaTdtQSIsInN1YiI6ImI2ZWI0NDEzLTYwY2MtNDE4NC04ZDZhLWU1NTk1OWEwY2U2ZiIsImVtYWlsX3ZlcmlmaWVkIjp0cnVlLCJpc3MiOiJodHRwczpcL1wvY29nbml0by1pZHAuYXAtc291dGhlYXN0LTIuYW1hem9uYXdzLmNvbVwvYXAtc291dGhlYXN0LTJfS3l2cUpKOFpYIiwicGhvbmVfbnVtYmVyX3ZlcmlmaWVkIjp0cnVlLCJjb2duaXRvOnVzZXJuYW1lIjoiYjZlYjQ0MTMtNjBjYy00MTg0LThkNmEtZTU1OTU5YTBjZTZmIiwiYXVkIjoiNWo1anMzcXZjZm5naDA4NWEwb2Jrc21rajkiLCJ0b2tlbl91c2UiOiJpZCIsImF1dGhfdGltZSI6MTU4NzI3Mzk1MiwicGhvbmVfbnVtYmVyIjoiKzYxNDI0NDQ4MjY5IiwiZXhwIjoxNTg3Mjc3NTUyLCJpYXQiOjE1ODcyNzM5NTIsImVtYWlsIjoibGV3YmFpbGV5OTRAZ21haWwuY29tIn0.yEwDhgHR0tTpi3YkbNwAHrT6dxKmrrvKCFeYBbykMKNMRSad7TuleIwEVyI7iZXa_vD_o5-VyA-Y6SKzjE01iHC3wiTiKAavWybWXpZesAnV8Hky9_40VXh-lUQ3pcTdXG1pqbQyHKEpgnm0phmbXvmdR8JKd2H8ypwOICtLwNTO9UpXgWdqDGyJXubMRilg9T1DcWqRZTeW-fbhsgkGGoKPyx9aXPDyTtCVbcteO_Z4U3V4yvXugu0xyAFV4CpycXvgZyEGJQZK_c9mqpEvUmxjYKFfbC7-Q1jAaFuLxBw5MZ1JRQCKYPoNugSC8RoCFIbsHjB2cXQfM7472UiNOQ"
+        ],
+        "Cache-Control": [
+            "no-cache"
+        ],
+        "CloudFront-Forwarded-Proto": [
+            "https"
+        ],
+        "CloudFront-Is-Desktop-Viewer": [
+            "true"
+        ],
+        "CloudFront-Is-Mobile-Viewer": [
+            "false"
+        ],
+        "CloudFront-Is-SmartTV-Viewer": [
+            "false"
+        ],
+        "CloudFront-Is-Tablet-Viewer": [
+            "false"
+        ],
+        "CloudFront-Viewer-Country": [
+            "AU"
+        ],
+        "Content-Type": [
+            "application/json"
+        ],
+        "Host": [
+            "4fgvpp9jlc.execute-api.ap-southeast-2.amazonaws.com"
+        ],
+        "Postman-Token": [
+            "608fa39c-dca8-42d8-8274-b4429cdd38b5"
+        ],
+        "User-Agent": [
+            "PostmanRuntime/7.21.0"
+        ],
+        "Via": [
+            "1.1 4cc1cef5b7e8e0c2a1020c88ce286fbd.cloudfront.net (CloudFront)"
+        ],
+        "X-Amz-Cf-Id": [
+            "KvlsDyQGr_nPusrftqetZUvNQQ2mvw7KM69sDmUZCkU77fN8m_dsHA=="
+        ],
+        "X-Amzn-Trace-Id": [
+            "Root=1-5e9beddf-9eba33a955002a266c58419c"
+        ],
+        "X-Forwarded-For": [
+            "155.143.243.40, 64.252.174.89"
+        ],
+        "X-Forwarded-Port": [
+            "443"
+        ],
+        "X-Forwarded-Proto": [
+            "https"
+        ]
+    },
+    "queryStringParameters": null,
+    "multiValueQueryStringParameters": null,
+    "pathParameters": {
+        "user_id": "b6eb4413-60cc-4184-8d6a-e55959a0ce6f",
+        "game_id": "01b93719-a256-4c71-b793-66be5036f2f6"
+    },
+    "stageVariables": null,
+    "requestContext": {
+        "resourceId": "uvlbix",
+        "authorizer": {
+            "claims": {
+                "at_hash": "oiqiOdFWQW3NHlvpvGi7mA",
+                "sub": "b6eb4413-60cc-4184-8d6a-e55959a0ce6f",
+                "email_verified": "true",
+                "iss": "https://cognito-idp.ap-southeast-2.amazonaws.com/ap-southeast-2_KyvqJJ8ZX",
+                "phone_number_verified": "true",
+                "cognito:username": "b6eb4413-60cc-4184-8d6a-e55959a0ce6f",
+                "aud": "5j5js3qvcfngh085a0obksmkj9",
+                "token_use": "id",
+                "auth_time": "1587273952",
+                "phone_number": "+61424448269",
+                "exp": "Sun Apr 19 06:25:52 UTC 2020",
+                "iat": "Sun Apr 19 05:25:52 UTC 2020",
+                "email": "lewbailey94@gmail.com"
+            }
+        },
+        "resourcePath": "/games/{game_id}/users/{user_id}",
+        "httpMethod": "DELETE",
+        "extendedRequestId": "LOIa9HOjywMFx9A=",
+        "requestTime": "19/Apr/2020:06:21:19 +0000",
+        "path": "/dev/games/01b93719-a256-4c71-b793-66be5036f2f6/users/b6eb4413-60cc-4184-8d6a-e55959a0ce6f",
+        "accountId": "016685703235",
+        "protocol": "HTTP/1.1",
+        "stage": "dev",
+        "domainPrefix": "4fgvpp9jlc",
+        "requestTimeEpoch": 1587277279664,
+        "requestId": "dc8c8a0e-ee91-44e2-be80-a02cd200fd82",
+        "identity": {
+            "cognitoIdentityPoolId": null,
+            "accountId": null,
+            "cognitoIdentityId": null,
+            "caller": null,
+            "sourceIp": "155.143.243.40",
+            "principalOrgId": null,
+            "accessKey": null,
+            "cognitoAuthenticationType": null,
+            "cognitoAuthenticationProvider": null,
+            "userArn": null,
+            "userAgent": "PostmanRuntime/7.21.0",
+            "user": null
+        },
+        "domainName": "4fgvpp9jlc.execute-api.ap-southeast-2.amazonaws.com",
+        "apiId": "4fgvpp9jlc"
+    },
+    "body": "",
+    "isBase64Encoded": false
+}
