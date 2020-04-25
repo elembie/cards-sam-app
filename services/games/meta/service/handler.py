@@ -8,22 +8,13 @@ from dataclasses import asdict, dataclass, field
 import boto3
 from boto3.exceptions import Boto3Error
 
-try:
-
-    from resource.routes import (
-        create_game,
-        exit_game,
-        make_response,
-    )
-
-except ImportError:
-
-    from functions.games.meta.resource.routes import (
-        create_game,
-        exit_game,
-        make_response,
-        get_user_key,
-    )
+from service.routes import (
+    create_game,
+    enter_game,
+    exit_game,
+    make_response,
+    get_user_key,
+)
 
 from . import db
 
@@ -38,6 +29,7 @@ class Route():
     function: Any = None
     args: List[Any] = field(default_factory=list)
     kwargs: dict = field(default_factory=dict)
+    
 
 guid = '[A-Za-z0-9-]+'
 
@@ -70,13 +62,17 @@ def handle(event, context):
         path = event['path']
         method = event['httpMethod']
         body = json.loads(event['body'])
+
+        game_id = None
         
-        
+        if event['pathParameters']:
+            params = event['pathParameters']
+            game_id = params['game_id'] if 'game_id' in params else None
 
         routes = [
             Route(path='/games', method='POST', function=create_game, args=[user_id, user_in_game, body]),
-            Route(path=f'/games/{guid}/users/{guid}$', method='POST', function=exit_game, args=[user_id, user_in_game, params['game_id']]),
-            Route(path=f'/games/{guid}/users/{guid}$', method='DELETE', function=exit_game, args=[user_id, user_in_game, params['game_id']]),
+            Route(path=f'/games/{guid}/users$', method='POST', function=enter_game, args=[user_id, user_in_game, game_id]),
+            Route(path=f'/games/{guid}/users$', method='DELETE', function=exit_game, args=[user_id, user_in_game, game_id]),
         ]
 
         route = next(

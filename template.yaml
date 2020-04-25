@@ -50,8 +50,8 @@ Resources:
   UserFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      CodeUri: functions/users
-      Handler: resource.handler.handle
+      CodeUri: services/users
+      Handler: service.handler.handle
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref TableNameParam
@@ -72,8 +72,8 @@ Resources:
   GamesFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      CodeUri: functions/games/meta
-      Handler: resource.handler.handle
+      CodeUri: services/games/meta
+      Handler: service.handler.handle
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref TableNameParam
@@ -152,7 +152,7 @@ Resources:
   PreSignupFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/presignup/
+      CodeUri: services/presignup/
       InlineCode: |
         def handler(event, context):
           event['response']['autoConfirmUser'] = False
@@ -241,7 +241,7 @@ Resources:
   OnConnectFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/connections/
+      CodeUri: services/connections/
       Handler: connect.handle
       MemorySize: 256
       
@@ -258,7 +258,7 @@ Resources:
   OnDisconnectFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/connections/
+      CodeUri: services/connections/
       Handler: disconnect.handle
       MemorySize: 256
       

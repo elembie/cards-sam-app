@@ -132,6 +132,6 @@
         "domainName": "xvpaggil7h.execute-api.ap-southeast-2.amazonaws.com",
         "apiId": "xvpaggil7h"
     },
-    "body": "{\"game_type\": \"SHD\",\"n_players\": 3,\"private\": true}",
+    "body": "{\"game_type\": \"SHD\",\"table_size\": 3,\"private\": true}",
     "isBase64Encoded": false
 }

@@ -2,6 +2,10 @@ from typing import List, Any
 from uuid import uuid4
 from dataclasses import dataclass, field
 
+from boto3.dynamodb.types import TypeSerializer
+
+serializer = TypeSerializer()
+
 class GameTypesEnum:
 
     SHD = 'SHD'
@@ -13,6 +17,11 @@ class GameTypesEnum:
             v for k, v in cls.__dict__.items() 
             if type(v) == str and '__' not in k 
         ]
+
+@dataclass
+class User:
+    id: str = None
+    in_game: bool = False
 
 
 @dataclass
@@ -34,12 +43,24 @@ class GameMeta:
         self.pk = f'GAME#{self.id}' if not self.pk else self.pk
         self.sk = f'META' if not self.sk else self.sk
 
+    def get_key(self) -> dict:
+        return GameMeta.make_key(self.id)
+
     def to_dict(self):
         return {
             k: v
             for k, v in self.__dict__.items()
             if k not in ['pk', 'sk']
         }
+
+    @classmethod
+    def make_key(cls, game_id):
+        return {
+            'pk': f'GAME#{game_id}',
+            'sk': f'META'
+        }
+
+
 
 @dataclass
 class GameUser:
@@ -49,12 +70,27 @@ class GameUser:
     game_id: str = None
     user_id: str = None
     connection_id: str = None
+    connected: bool = False
 
     def __post_init__(self):
         if not self.pk:
             self.pk = f'GAME#{self.game_id}'
         if not self.sk:
             self.sk = f'USER#{self.user_id}'
+
+    def to_dict(self):
+        return {
+            k: v
+            for k, v in self.__dict__.items()
+            if k not in ['pk', 'sk']
+        }
+
+    def to_dynamo(self):
+        return {
+            k: serializer.serialize(v)
+            for k, v in self.__dict__.items()
+        }
+
 
 
 @dataclass

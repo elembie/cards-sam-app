@@ -1,17 +1,18 @@
 import sys
 import json
 
-from unittest import TestCase
+from . import BaseTestCase
 from unittest.mock import patch, MagicMock
 
 sys.dont_write_bytecode = True
 
-from functions.users.resource.entities import User
-from functions.users.resource.handler import handle, get_user_from_claims
+from services.users.service.entities import User
+from services.users.service.handler import handle, get_user_from_claims
 
-class TestUserHanlder(TestCase):
+class TestUserHanlder(BaseTestCase):
 
     def setUp(self):
+        super().setUp()
         with open('tests/events/get-user-authd.json', 'r') as f:
             self.get_user_authd_event = json.load(f)   
 

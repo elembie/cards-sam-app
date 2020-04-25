@@ -6,12 +6,7 @@ from dataclasses import asdict
 import boto3
 from boto3.exceptions import Boto3Error
 
-try:
-    from resource.entities import User
-except ImportError:
-    # unit testing import
-    from functions.users.resource.entities import User
-
+from service.entities import User
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
