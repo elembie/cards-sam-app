@@ -1,4 +1,5 @@
 import os
+import warnings
 from unittest import TestCase
 
 import os
@@ -10,17 +11,21 @@ class BaseTestCase(TestCase):
 
     def setUp(self):
 
-        self.base_path = Path(os.getcwd())
-
-        print(f'Base path for package {self.base_path}')
+        warnings.filterwarnings(action="ignore", message="unclosed", 
+                         category=ResourceWarning)
 
         table_name = os.environ.get('TABLE_NAME', 'cards-app-table')
 
-        dynamo = boto3.resource('dynamodb', endpoint_url="http://localhost:8000")
+        resource = boto3.resource('dynamodb', endpoint_url="http://localhost:8000")
+        client = boto3.client('dynamodb', endpoint_url="http://localhost:8000")
 
-        print(f'Creating table {table_name}')
+        try:
+            table = resource.Table(table_name)
+            table.delete()
+        except client.exceptions.ResourceNotFoundException:
+            pass
 
-        result = dynamo.create_table(
+        result = resource.create_table(
             TableName=table_name,
             KeySchema=[
                 {
@@ -49,14 +54,13 @@ class BaseTestCase(TestCase):
             }
         )
 
-        self.db = dynamo.Table(table_name)
-
-        print('Table created')
-
-    def test_demo(self):
-        print('Testing')
-
     def tearDown(self):
-        print('Deleting table')
-        self.db.delete()
-        print('Table deleted')
+        try:
+            table_name = os.environ.get('TABLE_NAME', 'cards-app-table')
+            client = boto3.client('dynamodb', endpoint_url="http://localhost:8000")
+            resource = boto3.resource('dynamodb', endpoint_url="http://localhost:8000")
+            table = resource.Table(table_name)
+            table.delete()
+        except client.exceptions.ResourceNotFoundException:
+            pass
+

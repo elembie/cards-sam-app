@@ -1,10 +1,16 @@
+import os
 import sys
 import json
+from pathlib import Path
 
 from . import BaseTestCase
 from unittest.mock import patch, MagicMock
 
 sys.dont_write_bytecode = True
+
+test_path = Path(os.getcwd()) / 'services' / 'users'
+print(f'Adding to python path: {str(test_path)}')
+sys.path.append(str(test_path))
 
 from services.users.service.entities import User
 from services.users.service.handler import handle, get_user_from_claims
@@ -30,6 +36,9 @@ class TestUserHanlder(BaseTestCase):
 
 
     def test_get_user_authorized(self):
+
+        result = handle(self.get_user_authd_event, None)
+        self.assertEqual(result['statusCode'], 201)
 
         result = handle(self.get_user_authd_event, None)
         self.assertEqual(result['statusCode'], 200)
