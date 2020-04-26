@@ -89,7 +89,6 @@
     "queryStringParameters": null,
     "multiValueQueryStringParameters": null,
     "pathParameters": {
-        "user_id": "b6eb4413-60cc-4184-8d6a-e55959a0ce6f",
         "game_id": "01b93719-a256-4c71-b793-66be5036f2f6"
     },
     "stageVariables": null,

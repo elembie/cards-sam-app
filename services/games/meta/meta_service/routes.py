@@ -1,13 +1,15 @@
 import re
 import json
+import decimal
 import logging
 from typing import Any
+from json import JSONEncoder
 from dataclasses import asdict, dataclass
 
 from boto3.exceptions import Boto3Error
 from boto3.dynamodb.types import TypeSerializer
 
-from service.entities import User, GameMeta, GameUser, GameTypesEnum
+from meta_service.entities import User, GameMeta, GameUser, GameTypesEnum
 
 from . import db, table, db_client
 
@@ -15,6 +17,15 @@ log = logging.getLogger()
 log.setLevel(logging.INFO)
 
 serializer = TypeSerializer()
+
+class DecimalEncoder(JSONEncoder):
+    def default(self, o): # pylint: disable=method-hidden
+        if isinstance(o, decimal.Decimal):
+            if abs(o) % 1 > 0:
+                return float(o)
+            else:
+                return int(o)
+        return super(DecimalEncoder, self).default(o)
 
 
 def make_response(code: int, body: dict = {}) -> dict:
@@ -25,14 +36,7 @@ def make_response(code: int, body: dict = {}) -> dict:
         'headers': {
                 'Access-Control-Allow-Origin': '*'
         },
-        'body': json.dumps(body)
-    }
-
-
-def get_user_key(user_id: str) -> dict:
-    return {
-        'pk': f'USER#{user_id}',
-        'sk': f'#META#{user_id}'
+        'body': json.dumps(body, cls=DecimalEncoder)
     }
 
 
@@ -44,11 +48,11 @@ def as_dynamo_dict(data: dict) -> dict:
 
 
 
-def create_game(user_id: str, in_game: bool, body: dict):
+def create_game(user: User, body: dict):
     '''Create a new game and add the user to it'''
 
-    if in_game:
-        return {403, {'message': 'Cannot create game while currently playing'}}
+    if user.in_game:
+        return make_response(403, {'message': 'Cannot create game while currently playing'})
 
     log.info(f'Creating game with data {json.dumps(body)}')
 
@@ -60,7 +64,7 @@ def create_game(user_id: str, in_game: bool, body: dict):
 
     # if game attributes are missing use default
     try:
-        game = GameMeta(created_by=user_id, **body)
+        game = GameMeta(created_by=user.id, **body)
     except TypeError as e:
         return make_response(400, {'message': f'Invalid key in create game data: {str(e)}'})
 
@@ -72,30 +76,31 @@ def create_game(user_id: str, in_game: bool, body: dict):
         log.error(f'Unable to create game due to exception: {str(e)}')
         raise
 
-    response = enter_game(user_id, in_game, game.id)
+    response = enter_game(user, game.id)
 
     if response['statusCode'] != 200:
-        log.error(f'Unable to set user {user_id} in game {game.id}')
+        log.error(f'Unable to set user {user.id} in game {game.id}')
         log.info('Rolling back game')
         db.delete_item(
             Key=game.get_key()
         )
         return response
 
-    return make_response(201, response['body'])
+    return make_response(201, json.loads(response['body']))
 
 
-def enter_game(user_id: str, in_game: bool, game_id: str):
 
-    if in_game:
+def enter_game(user: User, game_id: str):
+
+    if user.in_game:
         return make_response(403, {'message': 'Cannot create game while currently playing'})
 
-    log.info(f'Adding user {user_id} to game {game_id}')
+    log.info(f'Adding user {user.id} to game {game_id}')
 
     try:
-        game_user = GameUser(user_id=user_id, game_id=game_id)
+        game_user = GameUser(user_id=user.id, game_id=game_id)
     except TypeError as e:
-        log.error(f'Unable to create user game mapping for user {user_id} and game {game_id}: {str(e)}')
+        log.error(f'Unable to create user game mapping for user {user.id} and game {game_id}: {str(e)}')
         return make_response(500, {'message': 'Unable to add user to game'})
 
     response = db_client.transact_write_items(
@@ -116,7 +121,7 @@ def enter_game(user_id: str, in_game: bool, game_id: str):
                     'ConditionExpression': 'players_joined < table_size',
                     'ExpressionAttributeValues': {
                         ':p': { 'N': '1' },
-                        ':pid': serializer.serialize([user_id])
+                        ':pid': serializer.serialize([user.id])
 
                     },
                     'ReturnValuesOnConditionCheckFailure': 'ALL_OLD'
@@ -125,7 +130,7 @@ def enter_game(user_id: str, in_game: bool, game_id: str):
             {
                 'Update': {
                     'TableName': table,
-                    'Key': as_dynamo_dict(get_user_key(user_id)),
+                    'Key': as_dynamo_dict(user.get_key()),
                     'UpdateExpression': 'set in_game = :g, game_id = :gid',
                     'ExpressionAttributeValues': {
                         ':g': serializer.serialize(True),

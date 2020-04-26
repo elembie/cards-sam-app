@@ -1,5 +1,6 @@
 import os
 import warnings
+from copy import deepcopy
 from unittest import TestCase
 
 import os
@@ -8,6 +9,30 @@ from pathlib import Path
 import boto3
 
 class BaseTestCase(TestCase):
+
+    @classmethod
+    def replace_auth_attribute(cls, event: dict, attribute: str, value: str) -> dict:
+
+        new = deepcopy(event)
+        new['requestContext']['authorizer']['claims'][attribute] = value
+        return new    
+
+    @classmethod
+    def replace_event_username(cls, event: dict, username: str)-> dict:
+
+        return cls.replace_auth_attribute(
+                event,
+                'cognito:username',
+                username
+            )
+
+    @classmethod
+    def replace_event_game_id(cls, event: dict, game_id: str) -> dict:
+
+        new = deepcopy(event)
+        new['pathParameters']['game_id'] = game_id
+        return new
+
 
     def setUp(self):
 
@@ -53,6 +78,8 @@ class BaseTestCase(TestCase):
                 'WriteCapacityUnits': 10
             }
         )
+
+        self.db = resource.Table(table_name)
 
     def tearDown(self):
         try:

@@ -8,12 +8,12 @@ from dataclasses import asdict, dataclass, field
 import boto3
 from boto3.exceptions import Boto3Error
 
-from service.routes import (
+from meta_service.entities import User
+from meta_service.routes import (
     create_game,
     enter_game,
     exit_game,
     make_response,
-    get_user_key,
 )
 
 from . import db
@@ -46,22 +46,22 @@ def handle(event, context):
         except KeyError:
             return make_response(401, {'message': 'Unauthorised'})
 
-        user_key = get_user_key(user_id)
+        user = User(id=user_id)
 
         # initial validations
         result = db.get_item(
-            Key=user_key
+            Key=user.get_key()
         )
 
         if not 'Item' in result:
             return make_response(401, {'Message': 'Could not find user'})
 
-        user_in_game = result['Item']['in_game']
+        user.in_game = result['Item']['in_game']
 
         # route and process response
         path = event['path']
         method = event['httpMethod']
-        body = json.loads(event['body'])
+        body = json.loads(event['body']) if event['body'] else None
 
         game_id = None
         
@@ -70,9 +70,9 @@ def handle(event, context):
             game_id = params['game_id'] if 'game_id' in params else None
 
         routes = [
-            Route(path='/games', method='POST', function=create_game, args=[user_id, user_in_game, body]),
-            Route(path=f'/games/{guid}/users$', method='POST', function=enter_game, args=[user_id, user_in_game, game_id]),
-            Route(path=f'/games/{guid}/users$', method='DELETE', function=exit_game, args=[user_id, user_in_game, game_id]),
+            Route(path='/games', method='POST', function=create_game, args=[user, body]),
+            Route(path=f'/games/{guid}/players$', method='POST', function=enter_game, args=[user, game_id]),
+            Route(path=f'/games/{guid}/players$', method='DELETE', function=exit_game, args=[user, game_id]),
         ]
 
         route = next(
@@ -93,4 +93,4 @@ def handle(event, context):
 
         log.error(f'Exception when processing request: {str(e)}')
         raise
-        return make_response(500, {'message': 'Internal server error'})
+        # return make_response(500, {'message': 'Internal server error'})
