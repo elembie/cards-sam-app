@@ -165,7 +165,6 @@ Resources:
           return event
       Handler: index.handler
       MemorySize: 128
-      
       Timeout: 3
 
   LambdaCognitoUserPoolExecutionPermission:
@@ -204,7 +203,7 @@ Resources:
       IntegrationType: AWS_PROXY
       IntegrationUri: 
         Fn::Sub: 
-          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnConnectFunction.Arn}/invocations
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectionManagerFunction.Arn}/invocations
             
   DisconnectRoute:
     Type: AWS::ApiGatewayV2::Route
@@ -226,7 +225,7 @@ Resources:
       IntegrationType: AWS_PROXY
       IntegrationUri: 
         Fn::Sub: 
-          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnDisconnectFunction.Arn}/invocations
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectionManagerFunction.Arn}/invocations
 
   Deployment:
     Type: AWS::ApiGatewayV2::Deployment
@@ -244,38 +243,21 @@ Resources:
       DeploymentId: !Ref Deployment
       ApiId: !Ref CardGameWebSocketApi
 
-  OnConnectFunction:
+  ConnectionManagerFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: services/connections/
-      Handler: connect.handle
+      Handler: connection_service.handler.handle
       MemorySize: 256
-      
 
-  OnConnectPermission:
+  ConnectionManagerPermission:
     Type: AWS::Lambda::Permission
     DependsOn:
       - CardGameWebSocketApi
+      - ConnectionManagerFunction
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !Ref OnConnectFunction
-      Principal: apigateway.amazonaws.com
-
-  OnDisconnectFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      CodeUri: services/connections/
-      Handler: disconnect.handle
-      MemorySize: 256
-      
-
-  OnDisconnectPermission:
-    Type: AWS::Lambda::Permission
-    DependsOn:
-      - CardGameWebSocketApi
-    Properties:
-      Action: lambda:InvokeFunction
-      FunctionName: !Ref OnDisconnectFunction
+      FunctionName: !Ref ConnectionManagerFunction
       Principal: apigateway.amazonaws.com
 
   # -- DATABASE --
@@ -303,12 +285,10 @@ Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway websocket connect endpoint URL "
-    Value: ${CardGameWebSocketApi.Arn}
-  OnConnectFunctionOutput:
-    Description: "On connect Lambda Function ARN"
-    Value: ${OnConnectFunction.Arn}
-  OnDisconnectFunctionOutput:
-    Description: "On disconnect Lambda Function ARN"
-    Value: ${OnDisconnectFunction.Arn}
+  ConnectionsTableArn:
+    Description: "Dynamo table ARN"
+    Value: !GetAtt CardsAppTable.Arn
+
+  WebSocketURI:
+    Description: "The WSS Protocol URI to connect to"
+    Value: !Join [ '', [ 'wss://', !Ref CardGameWebSocketApi, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]

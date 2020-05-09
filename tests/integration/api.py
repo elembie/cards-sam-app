@@ -13,8 +13,8 @@ handler.setFormatter(formatter)
 log.addHandler(handler)
 
 cognito = boto3.client('cognito-idp')
-user_pool_id = 'ap-southeast-2_KyvqJJ8ZX'
-app_client_id = '5j5js3qvcfngh085a0obksmkj9'
+user_pool_id = 'ap-southeast-2_H9SN2bqby'
+app_client_id = '7s15kdmtc3rp33tct70en9u7d0'
 
 def create_user(username: str, password: str) -> None:
     

@@ -117,7 +117,83 @@ class TestGamesHandler(BaseTestCase):
         self.assertTrue(self.users[1] in result['players'])
 
         user = self.db.get_item(
-            Key=
+            Key=self.make_user_key(self.users[1])
+        )['Item']
+
+        self.assertTrue(user['in_game'])
+        self.assertEqual(game_id, user['game_id'])
+
+    
+    def test_game_add_user_game_full(self):
+
+        # create game and add first user
+        event = self.replace_event_username(
+            self.create_game_authd_event,
+            self.users[0]
         )
+
+        response = handle(event, None)
+        self.assertEqual(s.CREATED, response['statusCode'])
+        
+        game_id = json.loads(response['body'])['id']
+
+        # add another two players (game full)
+        for i in range(1, len(self.users)-1):
+
+            event = self.replace_event_username(
+                self.join_game_authd_event,
+                self.users[i]
+            )
+
+            event = self.replace_event_game_id(
+                event,
+                game_id
+            )
+
+            response = handle(event, None)
+            self.assertEqual(s.OK, response['statusCode'])
+
+        # add final player    
+        event = self.replace_event_username(
+            self.join_game_authd_event,
+            self.users[3]
+        )
+
+        event = self.replace_event_game_id(
+            event,
+            game_id
+        )
+
+        response = handle(event, None)
+        self.assertEqual(s.FORBIDDEN, response['statusCode'])
+
+    
+    def test_game_add_user_already_playing(self):
+
+        # create game and add first user
+        event = self.replace_event_username(
+            self.create_game_authd_event,
+            self.users[0]
+        )
+
+        response = handle(event, None)
+        self.assertEqual(s.CREATED, response['statusCode'])
+
+        game_id = json.loads(response['body'])['id']
+
+        event = self.replace_event_username(
+            self.join_game_authd_event,
+            self.users[0]
+        )
+
+        event = self.replace_event_game_id(
+            event,
+            game_id
+        )
+
+        response = handle(event, None)
+        self.assertEqual(s.FORBIDDEN, response['statusCode'])
+
+        
 
 

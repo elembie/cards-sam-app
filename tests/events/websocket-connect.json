@@ -1,0 +1,76 @@
+{
+    "headers": {
+        "Host": "jepc6bx2m7.execute-api.ap-southeast-2.amazonaws.com",
+        "Sec-WebSocket-Extensions": "permessage-deflate; client_max_window_bits",
+        "Sec-WebSocket-Key": "rAFCw/5R8D07mbJmcC7dFA==",
+        "Sec-WebSocket-Version": "13",
+        "X-Amzn-Trace-Id": "Root=1-5eb64ba8-c0d2b9d052398250c2cd67b0",
+        "X-Forwarded-For": "155.143.243.40",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https"
+    },
+    "multiValueHeaders": {
+        "Host": [
+            "jepc6bx2m7.execute-api.ap-southeast-2.amazonaws.com"
+        ],
+        "Sec-WebSocket-Extensions": [
+            "permessage-deflate; client_max_window_bits"
+        ],
+        "Sec-WebSocket-Key": [
+            "rAFCw/5R8D07mbJmcC7dFA=="
+        ],
+        "Sec-WebSocket-Version": [
+            "13"
+        ],
+        "X-Amzn-Trace-Id": [
+            "Root=1-5eb64ba8-c0d2b9d052398250c2cd67b0"
+        ],
+        "X-Forwarded-For": [
+            "155.143.243.40"
+        ],
+        "X-Forwarded-Port": [
+            "443"
+        ],
+        "X-Forwarded-Proto": [
+            "https"
+        ]
+    },
+    "queryStringParameters": {
+        "token": "test"
+    },
+    "multiValueQueryStringParameters": {
+        "token": [
+            "test"
+        ]
+    },
+    "requestContext": {
+        "routeKey": "$connect",
+        "messageId": null,
+        "eventType": "CONNECT",
+        "extendedRequestId": "MQDCXE_QywMFWnw=",
+        "requestTime": "09/May/2020:06:20:24 +0000",
+        "messageDirection": "IN",
+        "stage": "dev",
+        "connectedAt": 1589005224685,
+        "requestTimeEpoch": 1589005224686,
+        "identity": {
+            "cognitoIdentityPoolId": null,
+            "cognitoIdentityId": null,
+            "principalOrgId": null,
+            "cognitoAuthenticationType": null,
+            "userArn": null,
+            "userAgent": null,
+            "accountId": null,
+            "caller": null,
+            "sourceIp": "155.143.243.40",
+            "accessKey": null,
+            "cognitoAuthenticationProvider": null,
+            "user": null
+        },
+        "requestId": "MQDCXE_QywMFWnw=",
+        "domainName": "jepc6bx2m7.execute-api.ap-southeast-2.amazonaws.com",
+        "connectionId": "MQDCXdenSwMCFkA=",
+        "apiId": "jepc6bx2m7"
+    },
+    "isBase64Encoded": false
+}

@@ -7,6 +7,9 @@ import os
 from pathlib import Path
 
 import boto3
+import docker
+from docker import DockerClient
+from docker.models.containers import Container
 
 class BaseTestCase(TestCase):
 
@@ -33,8 +36,36 @@ class BaseTestCase(TestCase):
         new['pathParameters']['game_id'] = game_id
         return new
 
+    
+    @classmethod
+    def make_user_key(cls, user_id: str):
+        return {
+            'pk': f'USER#{user_id}',
+            'sk': f'#META#{user_id}'
+        }
+
+    @classmethod
+    def setUpClass(cls):
+
+        cls.docker: DockerClient = docker.from_env()
+        cls.dynamo_container: Container = cls.docker.containers.run(
+            image='amazon/dynamodb-local',
+            ports={
+                '8000':'8000',
+            },
+            detach=True
+        )
+
+    @classmethod
+    def tearDownClass(cls):
+        
+        cls.dynamo_container.stop()
+        cls.dynamo_container.remove()
+
 
     def setUp(self):
+
+        
 
         warnings.filterwarnings(action="ignore", message="unclosed", 
                          category=ResourceWarning)

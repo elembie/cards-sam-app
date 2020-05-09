@@ -4,9 +4,11 @@ import decimal
 import logging
 from typing import Any
 from json import JSONEncoder
+from http import HTTPStatus as s
 from dataclasses import asdict, dataclass
 
 from boto3.exceptions import Boto3Error
+from boto3.dynamodb.conditions import Attr
 from boto3.dynamodb.types import TypeSerializer
 
 from meta_service.entities import User, GameMeta, GameUser, GameTypesEnum
@@ -52,21 +54,21 @@ def create_game(user: User, body: dict):
     '''Create a new game and add the user to it'''
 
     if user.in_game:
-        return make_response(403, {'message': 'Cannot create game while currently playing'})
+        return make_response(s.FORBIDDEN, {'message': 'Cannot create game while currently playing'})
 
     log.info(f'Creating game with data {json.dumps(body)}')
 
     try:
         if body['game_type'] not in GameTypesEnum.to_list():
-            return make_response(400, {'message': 'Invalid game type'})
+            return make_response(s.BAD_REQUEST, {'message': 'Invalid game type'})
     except KeyError:
-        return make_response(400, {'message': 'No game type selected'})
+        return make_response(s.BAD_REQUEST, {'message': 'No game type selected'})
 
     # if game attributes are missing use default
     try:
         game = GameMeta(created_by=user.id, **body)
     except TypeError as e:
-        return make_response(400, {'message': f'Invalid key in create game data: {str(e)}'})
+        return make_response(s.BAD_REQUEST, {'message': f'Invalid key in create game data: {str(e)}'})
 
     try:
         db.put_item(
@@ -86,14 +88,14 @@ def create_game(user: User, body: dict):
         )
         return response
 
-    return make_response(201, json.loads(response['body']))
+    return make_response(s.CREATED, json.loads(response['body']))
 
 
 
 def enter_game(user: User, game_id: str):
 
     if user.in_game:
-        return make_response(403, {'message': 'Cannot create game while currently playing'})
+        return make_response(s.FORBIDDEN, {'message': 'Cannot create game while currently playing'})
 
     log.info(f'Adding user {user.id} to game {game_id}')
 
@@ -101,56 +103,73 @@ def enter_game(user: User, game_id: str):
         game_user = GameUser(user_id=user.id, game_id=game_id)
     except TypeError as e:
         log.error(f'Unable to create user game mapping for user {user.id} and game {game_id}: {str(e)}')
-        return make_response(500, {'message': 'Unable to add user to game'})
+        return make_response(s.INTERNAL_SERVER_ERROR, {'message': 'Unable to add user to game'})
 
-    response = db_client.transact_write_items(
-        TransactItems=[
-            {
-                'Put': {
-                    'TableName': table,
-                    'Item': game_user.to_dynamo(),
-                    'ConditionExpression': 'attribute_not_exists(sk)',
-                    'ReturnValuesOnConditionCheckFailure': 'ALL_OLD'
+    try:
+        response = db_client.transact_write_items(
+            TransactItems=[
+                {
+                    'Put': {
+                        'TableName': table,
+                        'Item': game_user.to_dynamo(),
+                        'ConditionExpression': 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
+                        'ReturnValuesOnConditionCheckFailure': 'ALL_OLD'
+                    },
                 },
-            },
-            {
-                'Update': {
-                    'TableName': table,
-                    'Key': as_dynamo_dict(GameMeta.make_key(game_id)),
-                    'UpdateExpression': 'SET players_joined = players_joined + :p, players = list_append(players, :pid)',
-                    'ConditionExpression': 'players_joined < table_size',
-                    'ExpressionAttributeValues': {
-                        ':p': { 'N': '1' },
-                        ':pid': serializer.serialize([user.id])
+                {
+                    'Update': {
+                        'TableName': table,
+                        'Key': as_dynamo_dict(GameMeta.make_key(game_id)),
+                        'UpdateExpression': 'SET players_joined = players_joined + :p, players = list_append(players, :pid)',
+                        'ConditionExpression': 'players_joined < table_size',
+                        'ExpressionAttributeValues': {
+                            ':p': { 'N': '1' },
+                            ':pid': serializer.serialize([user.id])
 
-                    },
-                    'ReturnValuesOnConditionCheckFailure': 'ALL_OLD'
+                        },
+                        'ReturnValuesOnConditionCheckFailure': 'ALL_OLD'
+                    }
+                },
+                {
+                    'Update': {
+                        'TableName': table,
+                        'Key': as_dynamo_dict(user.get_key()),
+                        'UpdateExpression': 'set in_game = :g, game_id = :gid',
+                        'ExpressionAttributeValues': {
+                            ':g': serializer.serialize(True),
+                            ':gid': serializer.serialize(game_id)
+                        },
+                        'ReturnValuesOnConditionCheckFailure': 'ALL_OLD'
+                    }
                 }
-            },
-            {
-                'Update': {
-                    'TableName': table,
-                    'Key': as_dynamo_dict(user.get_key()),
-                    'UpdateExpression': 'set in_game = :g, game_id = :gid',
-                    'ExpressionAttributeValues': {
-                        ':g': serializer.serialize(True),
-                        ':gid': serializer.serialize(game_id)
-                    },
-                    'ReturnValuesOnConditionCheckFailure': 'ALL_OLD'
-                }
-            }
-            
-        ]
-    )
+                
+            ]
+        )
+    except db_client.exceptions.TransactionCanceledException:
+
+        log.error(f'User {user.id} unable to join game {game_id}')
+
+        try:
+            game = db.get_item(
+                        Key=GameMeta.make_key(game_id)
+                    )['Item']
+
+            if game['players_joined'] == game['table_size']:
+                return make_response(s.FORBIDDEN, {'message': 'Unable to join - game is full'})
+        except:
+            pass
+
+        return make_response(s.FORBIDDEN, {'message': 'Player unable to join'})
+
 
     response = db.get_item(
         Key=GameMeta.make_key(game_id)
     )
 
     if 'Item' not in response:
-        return make_response(404, {'message', 'User added but could not get game data'})
+        return make_response(s.OK, {'message', 'User added but could not get game data'})
 
-    return make_response(200, GameMeta(**response['Item']).to_dict())
+    return make_response(s.OK, GameMeta(**response['Item']).to_dict())
 
 
 def exit_game(user_id: str, in_game: bool, game_id: str):
