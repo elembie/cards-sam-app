@@ -17,7 +17,7 @@ class User(object):
             if not self.pk:
                 self.pk = f'USER#{self.id}'
             if not self.sk:
-                self.sk = f'#META#{self.id}'
+                self.sk = f'ENTITY'
 
     def to_dict(self):
         return {

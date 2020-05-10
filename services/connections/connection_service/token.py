@@ -66,7 +66,5 @@ def validate_and_decode(token):
     if claims['aud'] != app_client_id:
         log.warn('Token was not issued for this audience')
         return None
-
-    # now we can use the claims
-    log.info(f'JWT claims: {claims}')
+        
     return claims

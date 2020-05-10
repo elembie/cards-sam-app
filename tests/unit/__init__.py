@@ -30,6 +30,22 @@ class BaseTestCase(TestCase):
             )
 
     @classmethod
+    def replace_query_params(cls, event: dict, param: str, value: str):
+
+        new = deepcopy(event)
+        new['queryStringParameters'][param] = value
+        return new
+
+
+    @classmethod
+    def replace_request_context_param(cls, event: dict, param: str, value: str):
+
+        new = deepcopy(event)
+        new['requestContext'][param] = value
+        return new
+
+
+    @classmethod
     def replace_event_game_id(cls, event: dict, game_id: str) -> dict:
 
         new = deepcopy(event)
@@ -41,7 +57,7 @@ class BaseTestCase(TestCase):
     def make_user_key(cls, user_id: str):
         return {
             'pk': f'USER#{user_id}',
-            'sk': f'#META#{user_id}'
+            'sk': f'ENTITY'
         }
 
     @classmethod

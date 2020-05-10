@@ -249,6 +249,9 @@ Resources:
       CodeUri: services/connections/
       Handler: connection_service.handler.handle
       MemorySize: 256
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableNameParam
 
   ConnectionManagerPermission:
     Type: AWS::Lambda::Permission
