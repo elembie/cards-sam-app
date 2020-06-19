@@ -54,7 +54,7 @@ def create_game(user: User, body: dict):
     '''Create a new game and add the user to it'''
 
     if user.in_game:
-        return make_response(s.FORBIDDEN, {'message': 'Cannot create game while currently playing'})
+        return make_response(s.CONFLICT, {'message': 'Cannot create game while currently playing'})
 
     log.info(f'Creating game with data {json.dumps(body)}')
 
@@ -95,33 +95,19 @@ def create_game(user: User, body: dict):
 def enter_game(user: User, game_id: str):
 
     if user.in_game:
-        return make_response(s.FORBIDDEN, {'message': 'Cannot create game while currently playing'})
+        return make_response(s.CONFLICT, {'message': 'Cannot join a game while currently playing'})
 
     log.info(f'Adding user {user.id} to game {game_id}')
-
-    try:
-        game_user = GameUser(user_id=user.id, game_id=game_id)
-    except TypeError as e:
-        log.error(f'Unable to create user game mapping for user {user.id} and game {game_id}: {str(e)}')
-        return make_response(s.INTERNAL_SERVER_ERROR, {'message': 'Unable to add user to game'})
 
     try:
         response = db_client.transact_write_items(
             TransactItems=[
                 {
-                    'Put': {
-                        'TableName': table,
-                        'Item': game_user.to_dynamo(),
-                        'ConditionExpression': 'attribute_not_exists(pk) AND attribute_not_exists(sk)',
-                        'ReturnValuesOnConditionCheckFailure': 'ALL_OLD'
-                    },
-                },
-                {
                     'Update': {
                         'TableName': table,
                         'Key': as_dynamo_dict(GameMeta.make_key(game_id)),
                         'UpdateExpression': 'SET players_joined = players_joined + :p, players = list_append(players, :pid)',
-                        'ConditionExpression': 'players_joined < table_size',
+                        'ConditionExpression': 'players_joined < table_size AND NOT contains(players, :pid)',
                         'ExpressionAttributeValues': {
                             ':p': { 'N': '1' },
                             ':pid': serializer.serialize([user.id])
@@ -150,16 +136,17 @@ def enter_game(user: User, game_id: str):
         log.error(f'User {user.id} unable to join game {game_id}')
 
         try:
-            game = db.get_item(
-                        Key=GameMeta.make_key(game_id)
-                    )['Item']
+            game = db.get_item(Key=GameMeta.make_key(game_id))['Item']
 
             if game['players_joined'] == game['table_size']:
-                return make_response(s.FORBIDDEN, {'message': 'Unable to join - game is full'})
+                return make_response(s.CONFLICT, {'message': 'Unable to join - game is full'})
+            elif user.id in game['players']:
+                # player already in game so OK
+                return make_response(s.OK, GameMeta(**response['Item']).to_dict())
         except:
             pass
 
-        return make_response(s.FORBIDDEN, {'message': 'Player unable to join'})
+        return make_response(s.CONFLICT, {'message': 'Player unable to join'})
 
 
     response = db.get_item(

@@ -1,5 +1,7 @@
 import json
+import time
 import logging
+from dataclasses import asdict
 from http import HTTPStatus as s
 
 from jose import JWTError
@@ -9,6 +11,7 @@ from boto3.dynamodb.conditions import Key, Attr
 from connection_service.token import validate_and_decode
 
 from . import db
+from connection_service.entities import UserGameConnection
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
@@ -77,25 +80,35 @@ def handle(event, context):
         if not user.get('in_game', False) or not user.get('game_id', False):
             return make_response(s.CONFLICT, {'message', 'Cannot connect socket - user not in game'})
 
+        log.info('Checking for existing connections')
+
+        stale_connections = db.query(
+            KeyConditionExpression=Key('pk').eq(f'GAME#{user["game_id"]}') & Key('sk').begins_with('CONN#'),
+        )['Items']
+
+        for conn in stale_connections:
+            db.delete_item(Key={'pk': conn['pk'], 'sk': conn['sk']})
+
+        log.info(f'Removed {len(stale_connections)} connections')
+
         log.info(f'Connecting user {user_id} to game {user["game_id"]} with connection ID {connection_id}')
 
+        game_connection = UserGameConnection(
+            connection_id=connection_id,
+            game_id=user['game_id'],
+            user_id=user_id,
+            connected_at=int(time.time()),
+        )
+
+        log.info(f'Game connection {asdict(game_connection)}')
+
         try:
-            response = db.update_item(
-                Key={
-                    'pk': f'GAME#{user["game_id"]}',
-                    'sk': f'USER#{user_id}'
-                },
-                ConditionExpression=Attr('pk').exists() & Attr('sk').exists(),
-                UpdateExpression='SET connection_id = :conn_id, connected = :conn',
-                ExpressionAttributeValues={ 
-                    ':conn_id': connection_id,
-                    ':conn': True
-                }
+            response = db.put_item(
+                Item=asdict(game_connection),
+                ConditionExpression='attribute_not_exists(pk) AND attribute_not_exists(sk)'
             )
         except ClientError as e:
-            if e.response['Error']['Code'] != 'ConditionalCheckFailedException':
-                log.error('Unable to find user-game relation')
-                return make_response(s.NOT_FOUND, {'message': 'Unable to find user-game mapping'})
+            log.error(f'Exception raised when storing connection: {e}')
             raise
 
         log.info(response)
