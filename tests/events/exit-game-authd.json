@@ -1,6 +1,6 @@
 {
-    "resource": "/games/{game_id}/users/{user_id}",
-    "path": "/games/01b93719-a256-4c71-b793-66be5036f2f6/users/b6eb4413-60cc-4184-8d6a-e55959a0ce6f",
+    "resource": "/games/{game_id}/users",
+    "path": "/games/01b93719-a256-4c71-b793-66be5036f2f6/players",
     "httpMethod": "DELETE",
     "headers": {
         "Accept": "*/*",
@@ -111,7 +111,7 @@
                 "email": "lewbailey94@gmail.com"
             }
         },
-        "resourcePath": "/games/{game_id}/users/{user_id}",
+        "resourcePath": "/games/{game_id}/users",
         "httpMethod": "DELETE",
         "extendedRequestId": "LOIa9HOjywMFx9A=",
         "requestTime": "19/Apr/2020:06:21:19 +0000",

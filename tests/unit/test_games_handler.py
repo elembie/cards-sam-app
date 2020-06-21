@@ -50,6 +50,10 @@ class TestGamesHandler(BaseTestCase):
         with open('tests/events/join-game-authd.json') as f:
             self.join_game_authd_event = json.load(f)
 
+        with open('tests/events/exit-game-authd.json') as f:
+            self.exit_game_authd_event = json.load(f)
+
+
     def test_create_game_authd(self):
 
         event = self.replace_event_username(
@@ -193,6 +197,49 @@ class TestGamesHandler(BaseTestCase):
 
         response = handle(event, None)
         self.assertEqual(s.FORBIDDEN, response['statusCode'])
+
+
+    def test_exit_game(self):
+
+        # create game and add first user
+        event = self.replace_event_username(
+            self.create_game_authd_event,
+            self.users[0]
+        )
+
+        response = handle(event, None)
+        self.assertEqual(s.CREATED, response['statusCode'])
+        
+        game_id = json.loads(response['body'])['id']
+
+        # add another two players (game full)
+        for i in range(1, len(self.users)-1):
+
+            event = self.replace_event_username(
+                self.join_game_authd_event,
+                self.users[i]
+            )
+
+            event = self.replace_event_game_id(
+                event,
+                game_id
+            )
+
+            response = handle(event, None)
+            self.assertEqual(s.OK, response['statusCode'])
+
+        event = self.replace_event_username(
+            self.exit_game_authd_event,
+            self.users[0]
+        )
+
+        event = self.replace_event_game_id(
+            event,
+            game_id
+        )
+
+        response = handle(event, None)
+        self.assertEqual(s.OK, response['statusCode'])
 
         
 

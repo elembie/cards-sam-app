@@ -16,7 +16,7 @@ from connection_service.entities import UserGameConnection
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-def make_response(code: int, body: dict = {}) -> dict:
+def make_response(code: s, body: dict = {}) -> dict:
     '''Generates HTTP response expected by API gateway'''
 
     return {
@@ -84,6 +84,7 @@ def handle(event, context):
 
         stale_connections = db.query(
             KeyConditionExpression=Key('pk').eq(f'GAME#{user["game_id"]}') & Key('sk').begins_with('CONN#'),
+            FilterExpression=Attr('user_id').eq(user_id)
         )['Items']
 
         for conn in stale_connections:
@@ -109,11 +110,11 @@ def handle(event, context):
             )
         except ClientError as e:
             log.error(f'Exception raised when storing connection: {e}')
-            raise
+            return make_response(s.INTERNAL_SERVER_ERROR, {'message': 'Error when saving connection'})
 
         log.info(response)
 
-        return make_response(200, {'message': 'Connected'})
+        return make_response(s.OK, {'message': 'Connected'})
 
     elif event["requestContext"]["eventType"] == "DISCONNECT":
 

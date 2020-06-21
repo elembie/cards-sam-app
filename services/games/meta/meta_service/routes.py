@@ -159,16 +159,62 @@ def enter_game(user: User, game_id: str):
     return make_response(s.OK, GameMeta(**response['Item']).to_dict())
 
 
-def exit_game(user_id: str, in_game: bool, game_id: str):
+def exit_game(user: User, game_id: str):
     '''Removes a user from the game metadata'''
 
-    if not in_game:
-        return (403, {'message': 'Cannot exit - not currently playing'})
+    if not user.in_game:
+        return (s.CONFLICT, {'message': 'Cannot exit - not currently playing'})
 
-    log.info('EXITING GAME')
+    response = db.get_item(
+        Key=GameMeta.make_key(game_id)
+    )
+
+    if 'Item' not in response:
+        return make_response(s.NOT_FOUND, {'message', 'Could not find game meta'})
+
+    game: GameMeta = GameMeta(**response['Item'])
+
+    try:
+        user_index = game.players.index(user.id)
+    except ValueError:
+        return make_response(s.CONFLICT, {'message': 'User not found in game'})
+    
+    try:
+        response = db_client.transact_write_items(
+            TransactItems=[
+                {
+                    'Update': {
+                        'TableName': table,
+                        'Key': as_dynamo_dict(GameMeta.make_key(game_id)),
+                        'UpdateExpression': f'SET players_joined = players_joined - :p REMOVE players[{user_index}]',
+                        'ConditionExpression': f'players[{user_index}] = :pid',
+                        'ExpressionAttributeValues': {
+                            ':p': { 'N': '1' },
+                            ':pid': serializer.serialize(user.id),
+                        },
+                        'ReturnValuesOnConditionCheckFailure': 'ALL_OLD'
+                    }
+                },
+                {
+                    'Update': {
+                        'TableName': table,
+                        'Key': as_dynamo_dict(user.get_key()),
+                        'UpdateExpression': 'set in_game = :g, game_id = :gid',
+                        'ExpressionAttributeValues': {
+                            ':g': serializer.serialize(False),
+                            ':gid': serializer.serialize(None)
+                        },
+                        'ReturnValuesOnConditionCheckFailure': 'ALL_OLD'
+                    }
+                }
+                
+            ]
+        )
+
+    except db_client.exceptions.TransactionCanceledException as e:
+        log.error(f'Could not remove user due to exception {e}')
+        return make_response(s.INTERNAL_SERVER_ERROR, {'message': 'Could not remove user from game'}) 
+
+    log.info(f'User {user.id} exited game {game_id}')
     return make_response(200)
-    # try:
-    #     meta = db.get_item
-    # except Boto3Error as e:
-    #     log.error(f'Unable to find game meta data for game {game_id} due to exception: {str(e)}')
-    #     return make_response(500, {'message': 'Unable to find game'})
+
