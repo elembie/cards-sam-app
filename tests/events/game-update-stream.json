@@ -1,0 +1,48 @@
+{
+    "Records": [
+        {
+            "eventID": "f7f81e968468004b25b89c56ff399d91",
+            "eventName": "REMOVE",
+            "eventVersion": "1.1",
+            "eventSource": "aws:dynamodb",
+            "awsRegion": "ap-southeast-2",
+            "dynamodb": {
+                "ApproximateCreationDateTime": 1592824787.0,
+                "Keys": {
+                    "sk": {
+                        "S": "CONN#OhuwyfEVywMCJww="
+                    },
+                    "pk": {
+                        "S": "GAME#fcd0905d-c4c0-440f-ab78-0b1416eca2c3"
+                    }
+                },
+                "SequenceNumber": "191166700000000002644699746",
+                "SizeBytes": 66,
+                "StreamViewType": "KEYS_ONLY"
+            },
+            "eventSourceARN": "arn:aws:dynamodb:ap-southeast-2:016685703235:table/cards-app-table/stream/2020-06-22T11:18:09.380"
+        },
+        {
+            "eventID": "640622b870adf54e1e8a63f42060f85a",
+            "eventName": "MODIFY",
+            "eventVersion": "1.1",
+            "eventSource": "aws:dynamodb",
+            "awsRegion": "ap-southeast-2",
+            "dynamodb": {
+                "ApproximateCreationDateTime": 1592824787.0,
+                "Keys": {
+                    "sk": {
+                        "S": "META"
+                    },
+                    "pk": {
+                        "S": "GAME#fcd0905d-c4c0-440f-ab78-0b1416eca2c3"
+                    }
+                },
+                "SequenceNumber": "191166800000000002644699794",
+                "SizeBytes": 66,
+                "StreamViewType": "KEYS_ONLY"
+            },
+            "eventSourceARN": "arn:aws:dynamodb:ap-southeast-2:016685703235:table/cards-app-table/stream/2020-06-22T11:18:09.380"
+        }
+    ]
+}

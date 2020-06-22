@@ -9,6 +9,7 @@ from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key, Attr
 
 from connection_service.token import validate_and_decode
+from connection_service.manager import process_stream
 
 from . import db
 from connection_service.entities import UserGameConnection
@@ -35,6 +36,10 @@ def validation_failed_response():
 def handle(event, context):
 
     log.info(event)
+
+    if 'Records' in event:
+        n_records = process_stream(event['Records'])
+        return make_response(200, {'message': f'Processed {n_records} records'})
 
     connection_id = event["requestContext"].get("connectionId", None)
     token = event.get("queryStringParameters", {}).get("token", None)

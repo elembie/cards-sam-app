@@ -86,7 +86,7 @@ class TestGamesHandler(BaseTestCase):
         )
 
         response = handle(event, None)
-        self.assertEqual(s.FORBIDDEN, response['statusCode'])
+        self.assertEqual(s.CONFLICT, response['statusCode'])
 
     
     def test_game_add_user(self):
@@ -169,7 +169,7 @@ class TestGamesHandler(BaseTestCase):
         )
 
         response = handle(event, None)
-        self.assertEqual(s.FORBIDDEN, response['statusCode'])
+        self.assertEqual(s.CONFLICT, response['statusCode'])
 
     
     def test_game_add_user_already_playing(self):
@@ -196,7 +196,7 @@ class TestGamesHandler(BaseTestCase):
         )
 
         response = handle(event, None)
-        self.assertEqual(s.FORBIDDEN, response['statusCode'])
+        self.assertEqual(s.CONFLICT, response['statusCode'])
 
 
     def test_exit_game(self):

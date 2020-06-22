@@ -4,6 +4,7 @@ import uuid
 import json
 from pathlib import Path
 from unittest import TestCase
+from unittest.mock import patch
 from http import HTTPStatus as s
 
 from . import BaseTestCase
@@ -58,12 +59,17 @@ class TestConnectionsHandler(BaseTestCase):
         with open('tests/events/websocket-connect.json') as f:
             self.websocket_connect_event = json.load(f)
 
+        with open('tests/events/game-update-stream.json') as f:
+            self.game_update_stream_event = json.load(f)
+
         event = self.replace_event_username(
             self.create_game_authd_event,
             self.users[0]
         )
 
         response = games_handle(event, None)
+        self.game_id = json.loads(response['body'])['id']
+        self.game_update_stream_event['Records'][1]['dynamodb']['Keys']['pk']['s'] = f'GAME#{self.game_id}'
 
         self.assertEqual(s.CREATED, response['statusCode'])
 
@@ -96,6 +102,18 @@ class TestConnectionsHandler(BaseTestCase):
 
         response = handle(self.websocket_connect_event, None)
         self.assertEqual(s.UNAUTHORIZED, response['statusCode'])
+
+
+    def test_stream_handler_game_update(self):
+
+        with patch('connection_service.token.validate_and_decode') as mock_validator:
+            mock_validator.side_effect = lambda x: {'sub': self.users[0]}
+
+            response = handle(self.websocket_connect_event, None)
+            response = handle(self.game_update_stream_event, None)
+
+
+
 
 
 

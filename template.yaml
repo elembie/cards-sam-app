@@ -263,6 +263,14 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref TableNameParam
+      Events:
+        DynamoDBEvent:
+            Type: DynamoDB # More info about DynamoDB Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#dynamodb
+            Properties:
+                Stream:
+                    !GetAtt CardsAppTable.StreamArn
+                StartingPosition: LATEST
+                BatchSize: 10
 
   ConnectionManagerPermission:
     Type: AWS::Lambda::Permission
@@ -293,6 +301,8 @@ Resources:
         WriteCapacityUnits: 1
       SSESpecification:
         SSEEnabled: True
+      StreamSpecification:
+        StreamViewType: KEYS_ONLY
       TableName: !Ref TableNameParam
 
 Outputs:
