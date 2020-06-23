@@ -1,35 +1,61 @@
 {
     "Records": [
         {
-            "eventID": "f7f81e968468004b25b89c56ff399d91",
-            "eventName": "REMOVE",
-            "eventVersion": "1.1",
-            "eventSource": "aws:dynamodb",
-            "awsRegion": "ap-southeast-2",
-            "dynamodb": {
-                "ApproximateCreationDateTime": 1592824787.0,
-                "Keys": {
-                    "sk": {
-                        "S": "CONN#OhuwyfEVywMCJww="
-                    },
-                    "pk": {
-                        "S": "GAME#fcd0905d-c4c0-440f-ab78-0b1416eca2c3"
-                    }
-                },
-                "SequenceNumber": "191166700000000002644699746",
-                "SizeBytes": 66,
-                "StreamViewType": "KEYS_ONLY"
-            },
-            "eventSourceARN": "arn:aws:dynamodb:ap-southeast-2:016685703235:table/cards-app-table/stream/2020-06-22T11:18:09.380"
-        },
-        {
-            "eventID": "640622b870adf54e1e8a63f42060f85a",
+            "eventID": "dd85ed738321a699a0299c8af5e99404",
             "eventName": "MODIFY",
             "eventVersion": "1.1",
             "eventSource": "aws:dynamodb",
             "awsRegion": "ap-southeast-2",
             "dynamodb": {
-                "ApproximateCreationDateTime": 1592824787.0,
+                "ApproximateCreationDateTime": 1592901306.0,
+                "Keys": {
+                    "sk": {
+                        "S": "ENTITY"
+                    },
+                    "pk": {
+                        "S": "USER#46fa7aa2-2764-4064-af34-30c823ac9586"
+                    }
+                },
+                "NewImage": {
+                    "in_game": {
+                        "BOOL": false
+                    },
+                    "phone": {
+                        "S": "+61424448269"
+                    },
+                    "name": {
+                        "S": "elembie"
+                    },
+                    "sk": {
+                        "S": "ENTITY"
+                    },
+                    "id": {
+                        "S": "46fa7aa2-2764-4064-af34-30c823ac9586"
+                    },
+                    "pk": {
+                        "S": "USER#46fa7aa2-2764-4064-af34-30c823ac9586"
+                    },
+                    "email": {
+                        "S": "lewbailey94@gmail.com"
+                    },
+                    "game_id": {
+                        "NULL": true
+                    }
+                },
+                "SequenceNumber": "195357100000000015435091845",
+                "SizeBytes": 210,
+                "StreamViewType": "NEW_IMAGE"
+            },
+            "eventSourceARN": "arn:aws:dynamodb:ap-southeast-2:016685703235:table/cards-app-table/stream/2020-06-23T08:25:41.776"
+        },
+        {
+            "eventID": "9314cd6b805d463e3215f9d0eddb9349",
+            "eventName": "MODIFY",
+            "eventVersion": "1.1",
+            "eventSource": "aws:dynamodb",
+            "awsRegion": "ap-southeast-2",
+            "dynamodb": {
+                "ApproximateCreationDateTime": 1592901306.0,
                 "Keys": {
                     "sk": {
                         "S": "META"
@@ -38,11 +64,47 @@
                         "S": "GAME#fcd0905d-c4c0-440f-ab78-0b1416eca2c3"
                     }
                 },
-                "SequenceNumber": "191166800000000002644699794",
-                "SizeBytes": 66,
-                "StreamViewType": "KEYS_ONLY"
+                "NewImage": {
+                    "table_size": {
+                        "N": "4"
+                    },
+                    "private": {
+                        "BOOL": true
+                    },
+                    "players": {
+                        "L": [
+                            {
+                                "S": "5e20f3b7-b997-4893-9843-09665c6104d9"
+                            }
+                        ]
+                    },
+                    "players_joined": {
+                        "N": "1"
+                    },
+                    "sk": {
+                        "S": "META"
+                    },
+                    "invited_players": {
+                        "L": []
+                    },
+                    "game_type": {
+                        "S": "SHD"
+                    },
+                    "id": {
+                        "S": "fcd0905d-c4c0-440f-ab78-0b1416eca2c3"
+                    },
+                    "pk": {
+                        "S": "GAME#fcd0905d-c4c0-440f-ab78-0b1416eca2c3"
+                    },
+                    "created_by": {
+                        "S": "46fa7aa2-2764-4064-af34-30c823ac9586"
+                    }
+                },
+                "SequenceNumber": "195357200000000015435091846",
+                "SizeBytes": 295,
+                "StreamViewType": "NEW_IMAGE"
             },
-            "eventSourceARN": "arn:aws:dynamodb:ap-southeast-2:016685703235:table/cards-app-table/stream/2020-06-22T11:18:09.380"
+            "eventSourceARN": "arn:aws:dynamodb:ap-southeast-2:016685703235:table/cards-app-table/stream/2020-06-23T08:25:41.776"
         }
     ]
 }

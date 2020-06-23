@@ -24,7 +24,7 @@ from services.games.meta.meta_service.entities import User
 from services.games.meta.meta_service.handler import handle as games_handle
 from services.users.user_service.handler import handle as user_handle
 
-from services.connections.connection_service.handler import handle
+from services.connections.connection_service import handler
 
 class TestConnectionsHandler(BaseTestCase):
 
@@ -69,7 +69,7 @@ class TestConnectionsHandler(BaseTestCase):
 
         response = games_handle(event, None)
         self.game_id = json.loads(response['body'])['id']
-        self.game_update_stream_event['Records'][1]['dynamodb']['Keys']['pk']['s'] = f'GAME#{self.game_id}'
+        self.game_update_stream_event['Records'][1]['dynamodb']['Keys']['pk']['S'] = f'GAME#{self.game_id}'
 
         self.assertEqual(s.CREATED, response['statusCode'])
 
@@ -82,7 +82,7 @@ class TestConnectionsHandler(BaseTestCase):
             None
         )
 
-        response = handle(connect_no_token, None)
+        response = handler.handle(connect_no_token, None)
         self.assertEqual(s.UNAUTHORIZED, response['statusCode'])
 
 
@@ -94,23 +94,22 @@ class TestConnectionsHandler(BaseTestCase):
             None
         )
 
-        response = handle(connect_no_id, None)
+        response = handler.handle(connect_no_id, None)
         self.assertEqual(s.BAD_REQUEST, response['statusCode'])
 
     
     def test_connect_invalid_jwt(self):
 
-        response = handle(self.websocket_connect_event, None)
+        response = handler.handle(self.websocket_connect_event, None)
         self.assertEqual(s.UNAUTHORIZED, response['statusCode'])
 
 
     def test_stream_handler_game_update(self):
 
-        with patch('connection_service.token.validate_and_decode') as mock_validator:
-            mock_validator.side_effect = lambda x: {'sub': self.users[0]}
+        with patch.object(handler, 'validate_and_decode', return_value={'sub': self.users[0]}):
 
-            response = handle(self.websocket_connect_event, None)
-            response = handle(self.game_update_stream_event, None)
+            response = handler.handle(self.websocket_connect_event, None)
+            response = handler.handle(self.game_update_stream_event, None)
 
 
 

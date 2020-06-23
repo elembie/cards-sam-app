@@ -1,5 +1,9 @@
+import json
+import decimal
 import logging
+from json import JSONEncoder
 
+import boto3
 from boto3.dynamodb.conditions import Key
 from boto3.dynamodb.types import TypeDeserializer
 
@@ -10,11 +14,34 @@ log.setLevel(logging.INFO)
 
 serializer = TypeDeserializer()
 
+client = boto3.client('apigatewaymanagementapi', endpoint_url='https://jepc6bx2m7.execute-api.ap-southeast-2.amazonaws.com/dev')
+
+class DecimalEncoder(JSONEncoder):
+    def default(self, o): # pylint: disable=method-hidden
+        if isinstance(o, decimal.Decimal):
+            if abs(o) % 1 > 0:
+                return float(o)
+            else:
+                return int(o)
+        return super(DecimalEncoder, self).default(o)
+
+
 def process_stream(records: list):
 
     for record in records:
 
-        keys: dict = record['dynamodb']['Keys']
+        dynamo = record.get('dynamodb', None)
+
+        if not dynamo:
+            log.warn('Could not find dynamo object in record')
+            continue
+
+        keys: dict = dynamo.get('Keys', None)
+        image: dict = dynamo.get('NewImage', None)
+
+        if not keys or not image:
+            log.warn('Could not find keys and/or image in record')
+            continue
 
         for key in ['sk', 'pk']:
             if not keys.get(key, None):
@@ -22,18 +49,26 @@ def process_stream(records: list):
                 continue
             keys[key] = serializer.deserialize(keys[key])
 
-        print(f'Processing record with keys {keys}')
-
         if 'GAME#' in keys['pk'] and ('META' in keys['sk'] or 'STATE' in keys['sk']):
 
-            game_id = keys['pk'][5:]
+            game_id = keys.get('pk')[5:]
+            game_image = { k: serializer.deserialize(v) for k,v in image.items() }
 
-            print(f'Updating connections to game {game_id}')
+            log.info(f'Updating connections to game {game_id}')
 
             connections = db.query(
                 KeyConditionExpression=Key('pk').eq(f'GAME#{game_id}') & Key('sk').begins_with('CONN#'),
             )['Items']
 
-            print(connections)
+            message = {
+                'type': 'GAME_UPDATE',
+                'data': game_image,
+            }
 
-            pass
+            # for conn in connections:
+            #     log.info(f'Sending game update to user {conn["user_id"]} on connection ID {conn["connection_id"]}')
+            #     client.post_to_connection(
+            #         ConnectionId=conn['connection_id'],
+            #         Data=json.dumps(message, cls=DecimalEncoder).encode('utf-8')
+            #     )
+

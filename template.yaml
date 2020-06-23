@@ -263,6 +263,12 @@ Resources:
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref TableNameParam
+        - Statement:
+          - Effect: Allow
+            Action:
+            - 'execute-api:ManageConnections'
+            Resource:
+            - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${CardGameWebSocketApi}/*'
       Events:
         DynamoDBEvent:
             Type: DynamoDB # More info about DynamoDB Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#dynamodb
@@ -302,7 +308,7 @@ Resources:
       SSESpecification:
         SSEEnabled: True
       StreamSpecification:
-        StreamViewType: KEYS_ONLY
+        StreamViewType: NEW_IMAGE
       TableName: !Ref TableNameParam
 
 Outputs:
