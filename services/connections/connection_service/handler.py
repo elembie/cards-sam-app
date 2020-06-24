@@ -38,7 +38,12 @@ def handle(event, context):
     log.info(event)
 
     if 'Records' in event:
-        n_records = process_stream(event['Records'])
+        try:
+            n_records = process_stream(event['Records'])
+        except Exception as e:
+            log.error(f'Could not process stream due to exception {e}')
+            return make_response(500, {'message': 'Could not process stream'})
+            
         return make_response(200, {'message': f'Processed {n_records} records'})
 
     connection_id = event["requestContext"].get("connectionId", None)

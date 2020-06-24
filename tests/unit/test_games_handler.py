@@ -53,6 +53,9 @@ class TestGamesHandler(BaseTestCase):
         with open('tests/events/exit-game-authd.json') as f:
             self.exit_game_authd_event = json.load(f)
 
+        with open('tests/events/get-game-authd.json') as f:
+            self.get_game_authd_event = json.load(f)
+
 
     def test_create_game_authd(self):
 
@@ -68,6 +71,29 @@ class TestGamesHandler(BaseTestCase):
         self.assertEqual(self.users[0], result['created_by'])
         self.assertTrue(len(result['players']) == 1)
         self.assertEqual(1, result['players_joined'])
+
+    
+    def test_get_game(self):
+
+        event = self.replace_event_username(
+            self.create_game_authd_event,
+            self.users[0]
+        )
+
+        response = handle(event, None)
+        result = json.loads(response['body'])
+
+        self.assertEqual(s.CREATED, response['statusCode'])
+
+        event = self.replace_event_username(
+            self.get_game_authd_event,
+            self.users[0]
+        )
+
+        response = handle(event, None)
+        self.assertEqual(s.OK, response['statusCode'])
+
+
 
     
     def test_create_game_user_in_game(self):

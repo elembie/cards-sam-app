@@ -49,6 +49,20 @@ def as_dynamo_dict(data: dict) -> dict:
     }
 
 
+def get_game(user: User):
+
+    if not user.in_game or not user.game_id:
+        return make_response(s.NOT_FOUND, {'message': 'User not in game'})
+
+    log.info(f'Getting game {user.game_id} for user {user.id}')
+
+    result = db.get_item(Key=GameMeta.make_key(user.game_id)).get('Item', None)
+
+    if not result:
+        return {s.NOT_FOUND, {'message': f'Could not find game {user.game_id}'}}
+
+    return make_response(s.OK, GameMeta(**result).to_dict())
+
 
 def create_game(user: User, body: dict):
     '''Create a new game and add the user to it'''

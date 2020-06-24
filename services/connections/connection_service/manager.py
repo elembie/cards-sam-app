@@ -6,6 +6,7 @@ from json import JSONEncoder
 import boto3
 from boto3.dynamodb.conditions import Key
 from boto3.dynamodb.types import TypeDeserializer
+from botocore.exceptions import ClientError
 
 from . import db, table, db_client
 
@@ -60,15 +61,24 @@ def process_stream(records: list):
                 KeyConditionExpression=Key('pk').eq(f'GAME#{game_id}') & Key('sk').begins_with('CONN#'),
             )['Items']
 
+            log.info(f'Connections: {connections}')
+
             message = {
-                'type': 'GAME_UPDATE',
+                'type': 'META_UPDATE',
                 'data': game_image,
             }
 
-            # for conn in connections:
-            #     log.info(f'Sending game update to user {conn["user_id"]} on connection ID {conn["connection_id"]}')
-            #     client.post_to_connection(
-            #         ConnectionId=conn['connection_id'],
-            #         Data=json.dumps(message, cls=DecimalEncoder).encode('utf-8')
-            #     )
+            for conn in connections:
+                log.info(f'Sending game update to user {conn["user_id"]} on connection ID {conn["connection_id"]}')
+
+                try:
+                    client.post_to_connection(
+                        ConnectionId=conn['connection_id'],
+                        Data=json.dumps(message, cls=DecimalEncoder).encode('utf-8')
+                    )
+                except ClientError as e:
+                    if e.response['Error']['Code'] == 'GoneException':
+                        log.warn(f'Gone exception for {conn["connection_id"]}')
+                    else:
+                        raise
 

@@ -10,6 +10,7 @@ from boto3.exceptions import Boto3Error
 
 from meta_service.entities import User
 from meta_service.routes import (
+    get_game,
     create_game,
     enter_game,
     exit_game,
@@ -57,6 +58,7 @@ def handle(event, context):
             return make_response(401, {'Message': 'Could not find user'})
 
         user.in_game = result['Item']['in_game']
+        user.game_id = result['Item']['game_id']
 
         # route and process response
         path = event['path']
@@ -70,6 +72,7 @@ def handle(event, context):
             game_id = params['game_id'] if 'game_id' in params else None
 
         routes = [
+            Route(path='/games', method='GET', function=get_game, args=[user]),
             Route(path='/games', method='POST', function=create_game, args=[user, body]),
             Route(path=f'/games/{guid}/players$', method='POST', function=enter_game, args=[user, game_id]),
             Route(path=f'/games/{guid}/players$', method='DELETE', function=exit_game, args=[user, game_id]),
@@ -84,7 +87,7 @@ def handle(event, context):
             log.error(f'Unhandled request route: {path}, method: {method}')
             return make_response(400, {'message': 'Route or method not supported'})
 
-        log.info(f'Handling route [{path}] metho [{method}] with function {route.function.__name__}')
+        log.info(f'Handling route [{path}] method [{method}] with function {route.function.__name__}')
         
         return route.function(*route.args, **route.kwargs)
 
