@@ -46,7 +46,7 @@ Resources:
             Headers:
               Access-Control-Allow-Origin: "'*'"
               Access-Control-Allow-Methods: "'*'"
-        DEFAULT_4XX:
+        DEFAULT_5XX:
           ResponseParameters:
             Headers:
               Access-Control-Allow-Origin: "'*'"
@@ -72,6 +72,12 @@ Resources:
           Properties:
             RestApiId: !Ref CardGameHttpApi
             Path: /user
+            Method: GET
+        GetPlayer:
+          Type: Api
+          Properties:
+            RestApiId: !Ref CardGameHttpApi
+            Path: /user/{player_id}
             Method: GET
         CreateUser:
             Type: Api

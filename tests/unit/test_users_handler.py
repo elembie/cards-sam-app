@@ -1,6 +1,7 @@
 import os
 import sys
 import json
+import uuid
 from pathlib import Path
 from copy import deepcopy
 from http import HTTPStatus as s
@@ -31,6 +32,9 @@ class TestUserHanlder(BaseTestCase):
 
         with open('tests/events/get-user-no-claims.json', 'r') as f:
             self.get_user_no_claims_event = json.load(f)   
+
+        with open('tests/events/get-player-authd.json', 'r') as f:
+            self.get_player_authd_event = json.load(f)  
             
              
     def test_get_user_from_event_clams(self):
@@ -46,7 +50,6 @@ class TestUserHanlder(BaseTestCase):
         response = handle(self.create_user_authd_event, None)
 
         result = json.loads(response['body'])
-
 
         self.assertEqual(s.CREATED, response['statusCode'])
         self.assertEqual(result['name'], 'user-1')
@@ -97,5 +100,75 @@ class TestUserHanlder(BaseTestCase):
     def test_get_user_no_claims(self):
 
         result = handle(self.get_user_no_claims_event, None)
-        self.assertEqual(result['statusCode'], 400)
+        self.assertEqual(result['statusCode'], s.UNAUTHORIZED)
+
+
+    def test_get_player(self):
+
+        users = []
+
+        for i in range(2):
+
+            username = str(uuid.uuid4())
+            users.append(username)
+
+            event = self.replace_event_username(
+                self.create_user_authd_event,
+                username
+            )
+
+            response = handle(event, None)
+            self.assertEqual(s.CREATED, response['statusCode'])
+
+        event = self.replace_event_username(
+            self.get_player_authd_event,
+            users[0]
+        )
+
+        event = self.replace_event_path_param(
+            event,
+            'player_id',
+            users[1]
+        )
+
+        response = handle(event, None)
+        result = json.loads(response['body'])
+
+        self.assertEqual(s.OK, response['statusCode'])
+        self.assertTrue('name' in result)
+        self.assertTrue('id' in result)
+        self.assertEqual(2, len([k for k in result.keys()]))
+
+    
+    def test_get_player_not_found(self):
+
+        users = []
+        username = str(uuid.uuid4())
+        users.append(username)
+
+        event = self.replace_event_username(
+            self.create_user_authd_event,
+            username
+        )
+
+        response = handle(event, None)
+        self.assertEqual(s.CREATED, response['statusCode'])
+
+        event = self.replace_event_username(
+            self.get_player_authd_event,
+            username
+        )
+
+        event = self.replace_event_path_param(
+            event,
+            'player_id',
+            'does-not-exist'
+        )
+
+        response = handle(event, None)
+        result = json.loads(response['body'])
+
+        self.assertEqual(s.NOT_FOUND, response['statusCode'])
+
+
 

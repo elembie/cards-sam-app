@@ -25,6 +25,12 @@ class User(object):
             for k, v in self.__dict__.items()
             if k not in ['pk', 'sk']
         }
+
+    def to_player(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+        }
     
     def get_key(self):
         return {

@@ -52,6 +52,14 @@ class BaseTestCase(TestCase):
         new['pathParameters']['game_id'] = game_id
         return new
 
+
+    @classmethod
+    def replace_event_path_param(cls, event: dict, param: str, value: object):
+
+        new = deepcopy(event)
+        new['pathParameters'][param] = value
+        return new
+
     
     @classmethod
     def make_user_key(cls, user_id: str):
@@ -59,6 +67,7 @@ class BaseTestCase(TestCase):
             'pk': f'USER#{user_id}',
             'sk': f'ENTITY'
         }
+
 
     @classmethod
     def setUpClass(cls):
@@ -72,6 +81,7 @@ class BaseTestCase(TestCase):
             detach=True
         )
 
+
     @classmethod
     def tearDownClass(cls):
         
@@ -80,8 +90,6 @@ class BaseTestCase(TestCase):
 
 
     def setUp(self):
-
-        
 
         warnings.filterwarnings(action="ignore", message="unclosed", 
                          category=ResourceWarning)

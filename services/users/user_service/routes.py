@@ -52,6 +52,18 @@ def get_user(user: User) -> dict:
     return make_response(s.OK, User(**result['Item']).to_dict())
 
 
+def get_player(player_id: str):
+
+    player_user = User(id=player_id)
+
+    player: User = db.get_item(Key=player_user.get_key()).get('Item', None)
+
+    if not player:
+        return make_response(s.NOT_FOUND, {'message': 'Could not find player'})
+
+    return make_response(s.OK, User(**player).to_player())
+
+
 def create_user(user: User, body: dict) -> dict:
 
     if not body:
