@@ -198,7 +198,7 @@ Resources:
     Properties:
       Name: CardGameWebsocketApi
       ProtocolType: WEBSOCKET
-      RouteSelectionExpression: "$request.body.action"
+      RouteSelectionExpression: "$request.body.game"
 
   ConnectRoute:
     Type: AWS::ApiGatewayV2::Route
@@ -244,11 +244,60 @@ Resources:
         Fn::Sub: 
           arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ConnectionManagerFunction.Arn}/invocations
 
+  ShdGameActionRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref CardGameWebSocketApi
+      RouteKey: SHD
+      AuthorizationType: NONE
+      OperationName: ShdGameActionRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref ShdGameActionIntegration
+
+  ShdGameActionIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref CardGameWebSocketApi
+      Description: SHD game and player actions
+      IntegrationType: AWS_PROXY
+      IntegrationUri: 
+        Fn::Sub: 
+          arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${ShdGameActionFunction.Arn}/invocations
+
+  ShdGameActionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: services/games/shd
+      Handler: shd_service.handler.handle
+      MemorySize: 256
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref TableNameParam
+        - Statement:
+          - Effect: Allow
+            Action:
+            - 'execute-api:ManageConnections'
+            Resource:
+            - !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${CardGameWebSocketApi}/*'
+
+  ShdGameActionPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - CardGameWebSocketApi
+      - ShdGameActionFunction
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref ShdGameActionFunction
+      Principal: apigateway.amazonaws.com
+
   Deployment:
     Type: AWS::ApiGatewayV2::Deployment
     DependsOn:
     - ConnectRoute
     - DisconnectRoute
+    - ShdGameActionRoute
     Properties:
       ApiId: !Ref CardGameWebSocketApi
 
