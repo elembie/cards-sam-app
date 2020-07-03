@@ -1,0 +1,33 @@
+{
+    "requestContext": {
+        "routeKey": "SHD",
+        "messageId": "PFYdEeRxSwMAdUQ=",
+        "eventType": "MESSAGE",
+        "extendedRequestId": "PFYdEFUbSwMF9Og=",
+        "requestTime": "03/Jul/2020:06:46:43 +0000",
+        "messageDirection": "IN",
+        "stage": "dev",
+        "connectedAt": 1593758803401,
+        "requestTimeEpoch": 1593758803553,
+        "identity": {
+            "cognitoIdentityPoolId": null,
+            "cognitoIdentityId": null,
+            "principalOrgId": null,
+            "cognitoAuthenticationType": null,
+            "userArn": null,
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36",
+            "accountId": null,
+            "caller": null,
+            "sourceIp": "165.225.114.181",
+            "accessKey": null,
+            "cognitoAuthenticationProvider": null,
+            "user": null
+        },
+        "requestId": "PFYdEFUbSwMF9Og=",
+        "domainName": "jepc6bx2m7.execute-api.ap-southeast-2.amazonaws.com",
+        "connectionId": "PFYdDeRwywMAdUQ=",
+        "apiId": "jepc6bx2m7"
+    },
+    "body": "{\"game\":\"SHD\",\"data\":\"test\"}",
+    "isBase64Encoded": false
+}
