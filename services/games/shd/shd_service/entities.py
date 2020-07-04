@@ -68,6 +68,13 @@ class Player(object):
         else:
             return any((c.is_special for c in self.table))
 
+    
+    def sanitise_dict(self) -> dict:
+        player = asdict(self)
+        for key in ['hand', 'hidden', 'can_burn', 'can_play']:
+            del player[key]
+        return player
+
 
     def swap_table(self, hand_id: str = None, table_id: str = None):
 
@@ -162,6 +169,15 @@ class State(object):
             (p for p in self.players if p.order >= next_order and not p.is_out), 
             None
         )
+
+    def sanitise_dict(self) -> dict:
+
+        state = asdict(self)
+        state['stack'] = len(self.stack)
+        state['dead'] = len(self.dead)
+        state['players'] = [p.sanitise_dict() for p in self.players]
+        
+        return state
         
 
     def get_player(self, player_id: str) -> Player:

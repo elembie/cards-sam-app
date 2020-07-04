@@ -6,15 +6,23 @@ from http import HTTPStatus as s
 from dataclasses import dataclass, asdict
 
 from boto3.dynamodb.conditions import Key
+from boto3.dynamodb.types import TypeSerializer
 
 from . import db
 
 from shd_service.game import Game
-from shd_service.exceptions import InvalidMessage
+from shd_service.entities import Status
+from shd_service.exceptions import (
+    InvalidMessage,
+    InvalidState,
+    InvalidAction,
+)
 
 
 log = logging.getLogger()
 log.setLevel(logging.INFO)
+
+serialiser = TypeSerializer()
 
 class DecimalEncoder(JSONEncoder):
     def default(self, o): # pylint: disable=method-hidden
@@ -39,7 +47,7 @@ def make_response(code: int, body: dict = {}) -> dict:
 
 
 class Actions:
-    start_game = 'start_game'
+    deal = 'deal'
 
 
 @dataclass
@@ -78,7 +86,7 @@ def handle(event, context):
         body = json.loads(event.get('body', None))
         connection_id = request_context.get('connectionId', None)
 
-        if not context or not body:
+        if not request_context or not body:
             return make_response(s.BAD_REQUEST, {'message', 'Cannot find context or message body'})
         elif not connection_id:
             return make_response(s.BAD_REQUEST, {'message', 'Cannot find connection ID'})
@@ -116,19 +124,42 @@ def handle(event, context):
         log.info(state)
         log.info(player_conn)
             
-        if action.type == Actions.start_game:
+        game = None if not state else Game(state)
+
+        if action.type == Actions.deal:
             
-            if state:
-                return make_response(s.CONFLICT, {'message', 'Cannot create - game already exists'})
-            elif int(meta['table_size']) != len(meta['players']):
+            if int(meta['table_size']) != len(meta['players']):
                 return make_response(s.CONFLICT, {'message', 'Game not full, cannot start'})
+
+            if not game:
+                game = Game.new(n_players=int(meta['table_size']), game_id=meta['id'])
+                for p in meta['players']:
+                    game.add_player(p)
+
+            game.deal(player_id)                        
 
         else:
             return make_response(s.BAD_REQUEST, {'message': 'Unknown action type'})
 
+        state = game.sanitised_state()
+        state['pk'] = f'GAME#{game.game_id}'
+        state['sk'] = 'STATE'
+
+        #state = { k: serialiser.serialize(v) for k,v in state.items()}
+
+        db.put_item(Item=state)
+        
+        players = game.state.players
+
+        for p in players:
+            p = asdict(p)
+            p['pk'] = f'GAME#{game.game_id}'
+            p['sk'] = f'PLAYER#{p["id"]}'
+            db.put_item(Item=p)
+
         return make_response(s.OK, {})
 
     except Exception as e:
-        log.error('Error when processing websocket message: {e}')
+        log.error(f'Error when processing websocket message: {e}')
         raise
         #return make_response(s.INTERNAL_SERVER_ERROR, {'message': 'Error when processing message'})

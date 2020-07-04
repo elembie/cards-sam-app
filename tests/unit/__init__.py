@@ -1,10 +1,9 @@
 import os
+import json
 import warnings
+from pathlib import Path
 from copy import deepcopy
 from unittest import TestCase
-
-import os
-from pathlib import Path
 
 import boto3
 import docker
@@ -67,6 +66,22 @@ class BaseTestCase(TestCase):
             'pk': f'USER#{user_id}',
             'sk': f'ENTITY'
         }
+
+    
+    @classmethod
+    def replace_wbs_event_context(cls, event: dict, key: str, value):
+
+        new = deepcopy(event)
+        new['requestContext'][key] = value
+        return new
+        
+
+    @classmethod
+    def replace_wbs_event_body(cls, event: dict, body: dict):
+
+        body_string = json.dumps(body)
+        event['body'] = body_string
+        return json.loads(json.dumps(event))
 
 
     @classmethod

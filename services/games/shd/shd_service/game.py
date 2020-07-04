@@ -25,7 +25,7 @@ class Game(object):
     def new(cls, n_players: int = 3, game_id: str = '') -> 'Game':
 
         game = {
-            'game_id': None,
+            'game_id': game_id,
             'state': asdict(State(total_players=n_players)),
         }
 
@@ -45,6 +45,10 @@ class Game(object):
         }
 
     
+    def sanitised_state(self) -> dict:
+        return self.state.sanitise_dict()
+
+        
     def get_player_index(self, player_id: str) -> int:
         
         try:
@@ -66,7 +70,7 @@ class Game(object):
             )
         )
         
-        if self.state.n_players == self.total_players:
+        if self.state.n_players == self.state.total_players:
             self.state.status = Status.DEAL
 
     
