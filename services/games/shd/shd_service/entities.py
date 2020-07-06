@@ -69,10 +69,16 @@ class Player(object):
             return any((c.is_special for c in self.table))
 
     
-    def sanitise_dict(self) -> dict:
+    def sanitise_for_game(self) -> dict:
         player = asdict(self)
         for key in ['hand', 'hidden', 'can_burn', 'can_play']:
             del player[key]
+        return player
+
+    
+    def sanitise_for_player(self):
+        player = asdict(self)
+        del player['hidden']
         return player
 
 
@@ -175,7 +181,7 @@ class State(object):
         state = asdict(self)
         state['stack'] = len(self.stack)
         state['dead'] = len(self.dead)
-        state['players'] = [p.sanitise_dict() for p in self.players]
+        state['players'] = [p.sanitise_for_game() for p in self.players]
         
         return state
         

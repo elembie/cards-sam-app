@@ -140,19 +140,24 @@ def handle(event, context):
 
         else:
             return make_response(s.BAD_REQUEST, {'message': 'Unknown action type'})
+        
+        game_dict = game.to_dict()
+        game_dict['pk'] = f'GAME#{game.game_id}'
+        game_dict['sk'] = 'STATE'
+
+        db.put_item(Item=game_dict)
 
         state = game.sanitised_state()
-        state['pk'] = f'GAME#{game.game_id}'
-        state['sk'] = 'STATE'
 
-        #state = { k: serialiser.serialize(v) for k,v in state.items()}
+        state['pk'] = f'GAME#{game.game_id}'
+        state['sk'] = 'SANITISED'
 
         db.put_item(Item=state)
         
         players = game.state.players
 
         for p in players:
-            p = asdict(p)
+            p = p.sanitise_for_player()
             p['pk'] = f'GAME#{game.game_id}'
             p['sk'] = f'PLAYER#{p["id"]}'
             db.put_item(Item=p)

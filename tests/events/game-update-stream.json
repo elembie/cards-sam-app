@@ -105,6 +105,66 @@
                 "StreamViewType": "NEW_IMAGE"
             },
             "eventSourceARN": "arn:aws:dynamodb:ap-southeast-2:016685703235:table/cards-app-table/stream/2020-06-23T08:25:41.776"
+        },
+        {
+            "eventID": "dd85ed738321a699a0299c8af5e99404",
+            "eventName": "MODIFY",
+            "eventVersion": "1.1",
+            "eventSource": "aws:dynamodb",
+            "awsRegion": "ap-southeast-2",
+            "dynamodb": {
+                "ApproximateCreationDateTime": 1592901306.0,
+                "Keys": {
+                    "sk": {
+                        "S": "SANITISED"
+                    },
+                    "pk": {
+                        "S": "GAME#46fa7aa2-2764-4064-af34-30c823ac9586"
+                    }
+                },
+                "NewImage": {
+                    "is_sanitised": {
+                        "BOOL": true
+                    },
+                    "data": {
+                        "S": "test"
+                    }
+                },
+                "SequenceNumber": "195357100000000015435091845",
+                "SizeBytes": 210,
+                "StreamViewType": "NEW_IMAGE"
+            },
+            "eventSourceARN": "arn:aws:dynamodb:ap-southeast-2:016685703235:table/cards-app-table/stream/2020-06-23T08:25:41.776"
+        },
+        {
+            "eventID": "dd85ed738321a699a0299c8af5e99404",
+            "eventName": "MODIFY",
+            "eventVersion": "1.1",
+            "eventSource": "aws:dynamodb",
+            "awsRegion": "ap-southeast-2",
+            "dynamodb": {
+                "ApproximateCreationDateTime": 1592901306.0,
+                "Keys": {
+                    "sk": {
+                        "S": "PLAYER#46fa7aa2-2764-4064-af34-30c823ac9586"
+                    },
+                    "pk": {
+                        "S": "GAME#46fa7aa2-2764-4064-af34-30c823ac9586"
+                    }
+                },
+                "NewImage": {
+                    "is_sanitised": {
+                        "BOOL": true
+                    },
+                    "id": {
+                        "S": "test"
+                    }
+                },
+                "SequenceNumber": "195357100000000015435091845",
+                "SizeBytes": 210,
+                "StreamViewType": "NEW_IMAGE"
+            },
+            "eventSourceARN": "arn:aws:dynamodb:ap-southeast-2:016685703235:table/cards-app-table/stream/2020-06-23T08:25:41.776"
         }
     ]
 }

@@ -40,7 +40,6 @@ class Game(object):
     def to_dict(self) -> dict:
         return {
             'game_id': self.game_id,
-            'meta': asdict(self.meta),
             'state': asdict(self.state)
         }
 
