@@ -81,7 +81,8 @@ def handle(event, context):
     try:
 
         log.info(event)
-
+           
+        # ws message
         request_context = event.get('requestContext', None)
         body = json.loads(event.get('body', None))
         connection_id = request_context.get('connectionId', None)
@@ -117,7 +118,7 @@ def handle(event, context):
                 player_id = entity['user_id']
             elif sk == 'META':
                 meta = entity
-            elif sk == 'STATE':
+            elif sk == 'STATE#SHD':
                 state = entity
 
         log.info(meta)
@@ -143,14 +144,14 @@ def handle(event, context):
         
         game_dict = game.to_dict()
         game_dict['pk'] = f'GAME#{game.game_id}'
-        game_dict['sk'] = 'STATE'
+        game_dict['sk'] = 'STATE#SHD'
 
         db.put_item(Item=game_dict)
 
         state = game.sanitised_state()
 
         state['pk'] = f'GAME#{game.game_id}'
-        state['sk'] = 'SANITISED'
+        state['sk'] = 'SANITISED#SHD'
 
         db.put_item(Item=state)
         

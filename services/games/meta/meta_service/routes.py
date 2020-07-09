@@ -8,7 +8,7 @@ from http import HTTPStatus as s
 from dataclasses import asdict, dataclass
 
 from boto3.exceptions import Boto3Error
-from boto3.dynamodb.conditions import Attr
+from boto3.dynamodb.conditions import Attr, Key
 from boto3.dynamodb.types import TypeSerializer
 
 from meta_service.entities import User, GameMeta, GameUser, GameTypesEnum
@@ -56,12 +56,22 @@ def get_game(user: User):
 
     log.info(f'Getting game {user.game_id} for user {user.id}')
 
-    result = db.get_item(Key=GameMeta.make_key(user.game_id)).get('Item', None)
+    entitites = db.query(
+        KeyConditionExpression=Key('pk').eq(f'GAME#{user.game_id}')
+    ).get('Items', [])
 
-    if not result:
+    meta = next((e for e in entitites if e['sk'] == 'META'), None)
+    state = next((e for e in entitites if 'SANITISED' in e['sk']), None)
+    player = next((e for e in entitites if e['sk'] == f'PLAYER#{user.id}'), None)
+
+    if not any([meta, state, player]):
         return {s.NOT_FOUND, {'message': f'Could not find game {user.game_id}'}}
 
-    return make_response(s.OK, GameMeta(**result).to_dict())
+    return make_response(s.OK, {
+        'meta': meta,
+        'state': state,
+        'player': player
+    })
 
 
 def create_game(user: User, body: dict):
