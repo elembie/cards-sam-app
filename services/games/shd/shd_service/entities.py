@@ -1,3 +1,4 @@
+import uuid
 from enum import Enum
 from hashlib import md5
 from random import shuffle
@@ -16,13 +17,22 @@ class Card(object):
     value: int = None
     suit_value: int = None
     is_special: bool = None
+    is_hidden: bool = None
+    order: int = None
     played_by: str = None
 
     def __post_init__(self):
         self.value = RANKS.index(self.rank) + 2
         self.suit_value = SUITS.index(self.suit)
         self.is_special = self.rank in SPECIALS
-        self.id = md5((self.suit + str(self.value)).encode('utf-8')).hexdigest()
+        self.id = str(uuid.uuid4())
+
+    def to_hidden(self) -> dict:
+        return {
+            'id': self.id,
+            'is_hidden': self.is_hidden,
+            'order': self.order,
+        }
 
 
 @dataclass
@@ -71,14 +81,16 @@ class Player(object):
     
     def sanitise_for_game(self) -> dict:
         player = asdict(self)
-        for key in ['hand', 'hidden', 'can_burn', 'can_play']:
+        for key in ['can_burn', 'can_play']:
             del player[key]
+        player['hand'] = len(player['hand'])
+        player['hidden'] = [c.to_hidden() for c in self.hidden]
         return player
 
     
     def sanitise_for_player(self):
         player = asdict(self)
-        del player['hidden']
+        player['hidden'] = [c.to_hidden() for c in self.hidden]
         return player
 
 
@@ -94,8 +106,14 @@ class Player(object):
         except ValueError:
             raise ValueError('Cannot find card on players table')
 
-        self.hand.append(self.table.pop(table_index))
-        self.table.append(self.hand.pop(hand_index))
+        hand_card = self.hand.pop(hand_index)
+        table_card = self.table.pop(table_index)
+
+        hand_card.order = table_card.order
+        table_card.order = None
+
+        self.hand.append(table_card)
+        self.table.append(hand_card)
 
 
     def get_hand_index(self, card_id: str) -> int:

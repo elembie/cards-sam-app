@@ -84,9 +84,18 @@ class Game(object):
             raise InvalidAction('Player is not the dealer')
 
         for player in self.state.players:
-            for _ in range(3):
-                player.hidden.append(self.state.stack.pop())
-                player.table.append(self.state.stack.pop())
+            for i in range(3):
+
+                h = self.state.stack.pop()
+                h.is_hidden = True
+                h.order = i
+
+                player.hidden.append(h)
+
+                t = self.state.stack.pop()
+                t.order = 1
+                player.table.append(t)
+
                 player.hand.append(self.state.stack.pop())
 
         self.state.status = Status.PREP
@@ -186,7 +195,7 @@ class Game(object):
             self._end_turn()
 
 
-    def play_hidden(self, player_id):
+    def play_hidden(self, player_id: str, hidden_id: str):
 
         if self.state.status != Status.PLAYING:
             raise InvalidState('Cannot play card outside of playing stage')
@@ -196,7 +205,11 @@ class Game(object):
         if player.has_hand or player.has_table:
             raise InvalidAction('Player cannot play hidden cards yet')
 
-        card = player.hidden.pop()
+        card = next((c for c in player.hidden if c.id == hidden_id), None)
+
+        if not card:
+            raise InvalidAction('Cannot find hidden card on players table')
+
         card.played_by = player.id
 
         if card.is_special:
