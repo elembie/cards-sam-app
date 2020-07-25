@@ -93,7 +93,7 @@ class Game(object):
                 player.hidden.append(h)
 
                 t = self.state.stack.pop()
-                t.order = 1
+                t.order = i
                 player.table.append(t)
 
                 player.hand.append(self.state.stack.pop())

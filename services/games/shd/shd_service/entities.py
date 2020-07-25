@@ -25,7 +25,7 @@ class Card(object):
         self.value = RANKS.index(self.rank) + 2
         self.suit_value = SUITS.index(self.suit)
         self.is_special = self.rank in SPECIALS
-        self.id = str(uuid.uuid4())
+        self.id = self.id if self.id else str(uuid.uuid4())
 
     def to_hidden(self) -> dict:
         return {

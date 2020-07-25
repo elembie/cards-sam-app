@@ -47,7 +47,8 @@ def make_response(code: int, body: dict = {}) -> dict:
 
 
 class Actions:
-    deal = 'deal'
+    DEAL = 'DEAL'
+    SWAP = 'SWAP'
 
 
 @dataclass
@@ -127,7 +128,7 @@ def handle(event, context):
             
         game = None if not state else Game(state)
 
-        if action.type == Actions.deal:
+        if action.type == Actions.DEAL:
             
             if int(meta['table_size']) != len(meta['players']):
                 return make_response(s.CONFLICT, {'message', 'Game not full, cannot start'})
@@ -137,7 +138,11 @@ def handle(event, context):
                 for p in meta['players']:
                     game.add_player(p)
 
-            game.deal(player_id)                        
+            game.deal(player_id)
+
+        elif action.type == Actions.SWAP:
+            log.info(f'Swapping hand {action.data["hand"]} for table {action.data["table"]}')
+            game.swap_table(player_id, action.data['hand'], action.data['table'])
 
         else:
             return make_response(s.BAD_REQUEST, {'message': 'Unknown action type'})

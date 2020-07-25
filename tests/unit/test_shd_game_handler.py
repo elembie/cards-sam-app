@@ -124,9 +124,60 @@ class TestShdGameHandler(BaseTestCase):
             event,
             {
                 'gameId': self.game_id,
-                'type': 'deal'
+                'type': 'DEAL'
             }
         )
 
         handle(event, None)
+
+    def test_swap_cards(self):
+
+        event = self.replace_wbs_event_context(
+            self.websocket_message_event,
+            'connectionId',
+            self.users[0]
+        )
+
+        event = self.replace_wbs_event_body(
+            event,
+            {
+                'gameId': self.game_id,
+                'type': 'DEAL'
+            }
+        )
+
+        handle(event, None)
+
+        event = self.replace_event_username(
+            self.get_game_authd_event,
+            self.users[0]
+        )
+
+        response = json.loads(meta_handle(event, None)['body'])
+        player = response['player']
+        hand_id = player['hand'][0]['id']
+        table_id = player['table'][0]['id']
+
+        event = self.replace_wbs_event_context(
+            self.websocket_message_event,
+            'connectionId',
+            self.users[0]
+        )
+
+        event = self.replace_wbs_event_body(
+            event,
+            {
+                'gameId': self.game_id,
+                'type': 'SWAP',
+                'data': {
+                    'hand': hand_id,
+                    'table': table_id
+                }
+            }
+        )
+
+        handle(event, None)
+
+        print(response)
+
 
