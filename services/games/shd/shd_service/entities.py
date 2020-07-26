@@ -5,7 +5,7 @@ from random import shuffle
 from typing import Dict, List, Any
 from dataclasses import dataclass, field, asdict
 
-from shd_service.exceptions import InvalidState
+from shd_service.exceptions import InvalidState, InvalidAction
 from shd_service.constants import RANKS, SPECIALS, SUITS
 
 @dataclass
@@ -95,6 +95,9 @@ class Player(object):
 
 
     def swap_table(self, hand_id: str = None, table_id: str = None):
+
+        if (self.is_ready):
+            raise InvalidAction('Cannot swap after player is ready')
 
         try:
             hand_index = [ c.id for c in self.hand ].index(hand_id)

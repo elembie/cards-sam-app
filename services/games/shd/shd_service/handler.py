@@ -49,6 +49,7 @@ def make_response(code: int, body: dict = {}) -> dict:
 class Actions:
     DEAL = 'DEAL'
     SWAP = 'SWAP'
+    READY = 'READY'
 
 
 @dataclass
@@ -141,8 +142,14 @@ def handle(event, context):
             game.deal(player_id)
 
         elif action.type == Actions.SWAP:
+
             log.info(f'Swapping hand {action.data["hand"]} for table {action.data["table"]}')
             game.swap_table(player_id, action.data['hand'], action.data['table'])
+
+        elif action.type == Actions.READY:
+
+            log.info(f'Player {player_id} ready to play')
+            game.player_ready(player_id)
 
         else:
             return make_response(s.BAD_REQUEST, {'message': 'Unknown action type'})

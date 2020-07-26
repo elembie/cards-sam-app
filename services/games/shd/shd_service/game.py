@@ -123,7 +123,7 @@ class Game(object):
 
         self.state.players[idx].is_ready = True
 
-        if self.state.players_ready == self.meta.total_players:
+        if self.state.players_ready == self.state.total_players:
             self.state.status = Status.PLAYING
 
 
