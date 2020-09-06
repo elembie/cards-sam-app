@@ -2,6 +2,7 @@ import uuid
 from enum import Enum
 from hashlib import md5
 from random import shuffle
+from random import randint, random
 from typing import Dict, List, Any
 from dataclasses import dataclass, field, asdict
 
@@ -20,12 +21,18 @@ class Card(object):
     is_hidden: bool = None
     order: int = None
     played_by: str = None
+    rotation: int = 0
+    x_offset: int = 0
+    y_offset: int = 0
 
     def __post_init__(self):
         self.value = RANKS.index(self.rank) + 2
         self.suit_value = SUITS.index(self.suit)
         self.is_special = self.rank in SPECIALS
         self.id = self.id if self.id else str(uuid.uuid4())
+        self.rotation = randint(0, 359)
+        self.x_offset = randint(0,5)
+        self.y_offset = randint(0,5)
 
     def to_hidden(self) -> dict:
         return {
