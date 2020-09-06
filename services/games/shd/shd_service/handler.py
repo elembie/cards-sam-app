@@ -50,6 +50,7 @@ class Actions:
     DEAL = 'DEAL'
     SWAP = 'SWAP'
     READY = 'READY'
+    PLAY = 'PLAY'
 
 
 @dataclass
@@ -150,6 +151,12 @@ def handle(event, context):
 
             log.info(f'Player {player_id} ready to play')
             game.player_ready(player_id)
+
+        elif action.type == Actions.PLAY:
+
+            card_ids = action.data.get('cardIds', None) or [] 
+            log.info(f'Player {player_id} playing cards {card_ids}')
+            game.play_cards(player_id, card_ids)
 
         else:
             return make_response(s.BAD_REQUEST, {'message': 'Unknown action type'})
