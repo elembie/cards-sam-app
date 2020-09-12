@@ -29,10 +29,10 @@ class Card(object):
         self.value = RANKS.index(self.rank) + 2
         self.suit_value = SUITS.index(self.suit)
         self.is_special = self.rank in SPECIALS
-        self.id = self.id if self.id else str(uuid.uuid4())
-        self.rotation = randint(0, 359)
-        self.x_offset = randint(0,5)
-        self.y_offset = randint(0,5)
+        self.id = self.id or str(uuid.uuid4())
+        self.rotation = self.rotation or randint(0, 359) 
+        self.x_offset = self.x_offset or randint(0,5)
+        self.y_offset = self.y_offset or randint(0,5)
 
     def to_hidden(self) -> dict:
         return {

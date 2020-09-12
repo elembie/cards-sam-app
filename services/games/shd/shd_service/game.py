@@ -56,6 +56,10 @@ class Game(object):
             raise ValueError(f'Cannot find player with id {player_id}')
 
     
+    def get_player(self, player_id: str) -> Player:
+        return self.state.players[self.get_player_index(player_id)]
+
+    
     def add_player(self, player_id: str):
 
         n_players = self.state.n_players
@@ -66,6 +70,7 @@ class Game(object):
                 order=n_players,
                 is_dealer=n_players == 0,
                 is_active=n_players == 1,
+                can_play=n_players == 1,
             )
         )
         
@@ -205,7 +210,13 @@ class Game(object):
         if player.has_hand or player.has_table:
             raise InvalidAction('Player cannot play hidden cards yet')
 
-        card = next((c for c in player.hidden if c.id == hidden_id), None)
+        card_idx = None
+        try:
+            card_idx = [ c.id for c in player.hidden].index(hidden_id)
+        except ValueError:
+            raise InvalidAction(f'Hidden card {hidden_id} not in players hidden cards')
+
+        card = player.hidden.pop(card_idx)
 
         if not card:
             raise InvalidAction('Cannot find hidden card on players table')
@@ -286,9 +297,12 @@ class Game(object):
         next_player.is_active = True
 
         next_player.can_play = self.state.player_can_play(next_player.id)
+
+        if len([ p.id for p in self.state.players if not p.is_out ]) == 1:
+            self._end_roud()
         
 
-    def end_roud(self):
+    def _end_roud(self):
         pass
 
 

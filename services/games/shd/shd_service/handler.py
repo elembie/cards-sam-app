@@ -47,13 +47,13 @@ def make_response(code: int, body: dict = {}) -> dict:
 
 
 class Actions:
+    PING = 'PING'
     DEAL = 'DEAL'
     SWAP = 'SWAP'
     READY = 'READY'
     PLAY = 'PLAY'
     BURN = 'BURN'
     PICKUP = 'PICKUP'
-    HIDDEN = 'HIDDEN'
 
 
 @dataclass
@@ -105,6 +105,10 @@ def handle(event, context):
         except InvalidMessage as e:
             log.error(f'Unable to load action due to error {e}')
             return make_response(s.BAD_REQUEST, {'message': 'Invalid message schema'})
+
+        if (action.type == Actions.PING):
+            log.info(f'PONG')
+            return make_response(s.OK, {})
 
         log.info(f'Processing action: {asdict(action)}')
 
@@ -158,8 +162,18 @@ def handle(event, context):
         elif action.type == Actions.PLAY:
 
             card_ids = action.data.get('cardIds', None) or [] 
-            log.info(f'Player {player_id} playing cards {card_ids}')
-            game.play_cards(player_id, card_ids)
+
+            game_player = game.get_player(player_id)
+
+            if not game_player.has_hand and not game_player.has_table:
+
+                log.info(f'Player {player_id} playing hidden card {card_ids}')
+                game.play_hidden(player_id, card_ids[0])
+
+            else:
+
+                log.info(f'Player {player_id} playing cards {card_ids}')
+                game.play_cards(player_id, card_ids)
 
         elif action.type == Actions.PICKUP:
 
@@ -170,11 +184,6 @@ def handle(event, context):
 
             log.info(f'Player {player_id} burning deck')
             game.burn_table(player_id)
-
-        elif action.type == Actions.HIDDEN:
-
-            hidden_id = action.data.get('cardId', None) or ''
-            log.info(f'Player {player_id}')
 
         else:
             return make_response(s.BAD_REQUEST, {'message': 'Unknown action type'})
