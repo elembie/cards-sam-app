@@ -51,6 +51,9 @@ class Actions:
     SWAP = 'SWAP'
     READY = 'READY'
     PLAY = 'PLAY'
+    BURN = 'BURN'
+    PICKUP = 'PICKUP'
+    HIDDEN = 'HIDDEN'
 
 
 @dataclass
@@ -157,6 +160,21 @@ def handle(event, context):
             card_ids = action.data.get('cardIds', None) or [] 
             log.info(f'Player {player_id} playing cards {card_ids}')
             game.play_cards(player_id, card_ids)
+
+        elif action.type == Actions.PICKUP:
+
+            log.info(f'Player {player_id} picking up table')
+            game.pickup_table(player_id)
+
+        elif action.type == Actions.BURN:
+
+            log.info(f'Player {player_id} burning deck')
+            game.burn_table(player_id)
+
+        elif action.type == Actions.HIDDEN:
+
+            hidden_id = action.data.get('cardId', None) or ''
+            log.info(f'Player {player_id}')
 
         else:
             return make_response(s.BAD_REQUEST, {'message': 'Unknown action type'})
