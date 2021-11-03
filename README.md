@@ -10,6 +10,7 @@
     - Lambda
     - Cognito
     - DynamoDB
+    - NoSQL data modelling
     - Application Gateway (with websockets)
     - Serverless Application Model yaml 
 
